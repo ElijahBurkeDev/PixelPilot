@@ -1,0 +1,1476 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <title>Pixel Pilot</title>
+    <link rel="icon" type="image/x-icon" href="./ppfavicon.ico" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body
+    onload="
+      queryShipCookie() ||
+        setScorebar() ||
+        setPicture(classicSpaceshipPrev) ||
+        setCard('CLASSIC', classicstats) ||
+        setSelectedShipCookie(
+          7,
+          1,
+          '1ast',
+          1,
+          'single-shot',
+          50,
+          50,
+          1,
+          110,
+          90,
+          './CODING_SPACESHIP_67ca5e7e29855.png',
+          'c',
+        )
+    "
+  >
+    <div id="startScreen"></div>
+
+    <p class="title">PIXEL PILOT</p>
+
+    <p class="updateTitle">HANGAR AND MUSIC UPDATE</p>
+
+    <button
+      class="button button1"
+      onclick="startGame() || hideDiv('startScreen')"
+    >
+      START GAME
+    </button>
+
+    <button
+      class="button button2"
+      onclick="hideDiv('startScreen') || showDiv('howPlay')"
+    >
+      HOW TO PLAY
+    </button>
+
+    <button
+      class="button button3"
+      onclick="hideDiv('startScreen') || showDiv('changelog')"
+    >
+      CHANGELOG
+    </button>
+
+    <button
+      class="button button4"
+      onclick="hideDiv('startScreen') || showDiv('credits')"
+    >
+      CREDITS
+    </button>
+
+    <button
+      class="button button5"
+      onclick="hideDiv('startScreen') || showDiv('settings')"
+    >
+      SETTINGS
+    </button>
+
+    <button
+      class="button button6"
+      onclick="
+        hideDiv('startScreen') ||
+          showDiv('hanger') ||
+          setPicture(classicSpaceshipPrev) ||
+          setCard('CLASSIC', classicstats)
+      "
+    >
+      HANGAR
+    </button>
+
+    <img
+      class="shipImage"
+      src="./CODING_SPACESHIP_67ca5e7e29855.png"
+      width="384"
+      height="384"
+    />
+
+    <div class="howPlay" id="howPlay">
+      <p style="font-size: 60px; font-family: '8bit-font-text'">HOW TO PLAY</p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Welcome to Pixel Pilot! In this game, you must weave your way through
+        the obstacles, using your <b>UP</b> and <b>DOWN</b> or <b>W</b> and
+        <b>S</b> keys. The further you go, the more Pixel Pieces you will get!
+        Use these to buy new spaceships in the hangar! As time goes on, your
+        spaceship will gain more speed. Be careful, and good luck, pilot!
+      </p>
+      <br />
+
+      <button
+        style="font-family: '8bit-font-text'"
+        class="button_hp button_hp1"
+        onclick="hideDiv('howPlay') || showDiv('startScreen')"
+      >
+        BACK
+      </button>
+    </div>
+
+    <div class="changeLog" id="changelog">
+      <p style="font-size: 60px; font-family: '8bit-font-text'">CHANGELOG</p>
+      <p style="font-size: 30px; font-family: '8bit-font-text'">
+        <b>RELEASED: (2/3/2025)</b>
+      </p>
+      <p></p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Pixel Pilot was released to 8-9 Student Commons. Please know this game
+        is still really raw and will have bugs.
+      </p>
+      <br />
+      <p style="font-size: 30px; font-family: '8bit-font-text'">
+        <b>Update: I (2/17/2025)</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Improved hit box for spaceship. Please note that JavaScript only allows
+        circles and squares, so the hitbox is still not perfect.
+      </p>
+
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Added difficultly levels.
+      </p>
+
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Added GAME OVER screen with game score and overall score.
+      </p>
+
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Implemented the use of cookies. Your total score is now forever saved,
+        unless you go into browser settings and delete cookies data.
+      </p>
+
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Improved visibillity of game title by thickening shadow and changing
+        the color to one with more contrast.
+      </p>
+      <br />
+      <p style="font-size: 30px; font-family: '8bit-font-text'">
+        <b>Update II: Hangar and Music Update (4/26/2025)</b>
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>Gameplay Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Improved the way in which the game increases the speed. Instead of
+        speed increments every X amount of seconds, the gap between speed
+        increments now gets faster as time goes on. This allows the player to
+        get into a sort of groove before things get too fast, will still making
+        for a climactic gameplay.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Changed the frequency of obstacles.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Added the abillity of getting in <b>NEW</b> spaceships with
+        <b>DIFFERENT</b> specifications! Click on 'hangar' in the main menu to
+        view and purchase spaceships. Although there is only one alternative
+        spaceship as of this update, <i>WAY</i> more are on the way, with some
+        designs from 8-9ers. It took a lot of programming to enable changing
+        spaceships, so further additions will be faster and easier in the
+        future. If <i>YOU</i> would like to see a spaceship you made in this
+        game, let me know!
+      </p>
+
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Added in game music. (See Credits) I had to switch to a different file
+        hoster to host MP3 files-- and needless to say this took a <i>long</i>,
+        <i>long</i> time.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Greatly fixed spaceship hitboxes. Hitboxes are now more accurate and
+        give <i>some</i> leeway to the player.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Difficulties have been removed because they would allow for more Pixel
+        Pieces after less effort. This will also create a greater incentive to
+        buy spaceships the enhance gameplay in the future.
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>UI Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Made changelog easier to navigate and more visiualy appealing.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Improved end screen.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Changed HoW To Play section.
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>Other Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -As you have probably noticed, I have changed my website provider. While
+        this makes little to no differences now, it will allow for
+        <b>GREAT</b> changes in the future.
+      </p>
+
+      <p style="font-size: 30px; font-family: '8bit-font-text'">
+        <b>Update II.1: Bug Fix (4/28/2025)</b>
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>Gameplay Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Caused both the during-game score and the Pixel Pieces to be rounded to
+        integers.
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>UI Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Fixed glitches concerning the purchasing and equiping of ships.
+      </p>
+      <p style="font-size: 25px; font-family: '8bit-font-text'">
+        <b>Other Changes</b>
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Changed scoure files from Schoology to Github, ensuring stable access
+        to all users.
+      </p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        -Changed file type of the background, making a <b>MUCH</b> crisper
+        background.
+      </p>
+      <button
+        style="font-family: '8bit-font-text'"
+        class="button_hp button_hp1"
+        onclick="hideDiv('changelog') || showDiv('startScreen')"
+      >
+        BACK
+      </button>
+    </div>
+
+    <div class="howPlay" id="credits">
+      <p style="font-size: 60px; font-family: '8bit-font-text'">CREDITS</p>
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        All music was created by Josiah Burke.
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Start screen song: "A Happy FX Tune I Call Flitting Chinchillas"
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        In game song: "Torrential Bits"
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        W3 Schools for pieces of code.
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Adam Knowles for advice and help with bugs.
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Mr. Erickson for advice with bugs.
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        Josiah Burke for gameplay testing.
+      </p>
+      <br />
+      <p style="font-size: 20px; font-family: '8bit-font-text'">
+        All the people in 8-9 who have given and continue to give helpful
+        feedback.
+      </p>
+      <button
+        style="font-family: '8bit-font-text'"
+        class="button_hp button_hp1"
+        onclick="hideDiv('credits') || showDiv('startScreen')"
+      >
+        BACK
+      </button>
+    </div>
+
+    <div class="howPlay" id="settings">
+      <p style="font-size: 60px; font-family: '8bit-font-text'">Settings</p>
+
+      <br />
+      <br />
+      <p style="font-family: '8bit-font-text'">
+        Nothing here right now! Come back later.
+      </p>
+      <p>
+        <br />
+        <br />
+        <br />
+        <br />
+        <button
+          style="font-family: '8bit-font-text'"
+          class="button_hp button_hp1"
+          onclick="hideDiv('settings') || showDiv('startScreen')"
+        >
+          BACK
+        </button>
+      </p>
+    </div>
+
+    <div
+      class="gameEnd"
+      style="font-family: '8bit-font-text'"
+      id="endScreen"
+    ></div>
+
+    <div
+      class="hanger"
+      id="hanger"
+      style="
+        background-image: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 1),
+          rgba(0, 0, 0, 0)
+        );
+      "
+    >
+      <div class="purchaseDialog" id="purchaseDialog"></div>
+      <div class="overlay" id="overlay"></div>
+
+      <div class="hangerBar" id="hangerBar"></div>
+
+      <div class="spaceshipStats" id="spaceshipStats">Hello</div>
+      <div class="spaceshipName" id="spaceshipName"></div>
+
+      <div class="spaceshipSelector" id="spaceshipSelector">
+        <a
+          onclick="
+            setCard('CLASSIC', classicstats) || setPicture(classicSpaceshipPrev)
+          "
+        >
+          <img
+            class="SpaceshipNav"
+            src="./CODING_SPACESHIP_67ca5e7e29855.png"
+            width="215"
+            height="192"
+          />
+        </a>
+
+        <a
+          onclick="
+            setCard('Pixel Piece Prospecter', pixproStats) ||
+              setPicture(pieproSpaceshipsPrev)
+          "
+        >
+          <img
+            class="SpaceshipNav"
+            src="./Green_Spaceship_nbg_.png"
+            width="215"
+            height="192"
+          />
+        </a>
+
+        <a
+          onclick="
+            setCard('Void Runner', voirunStats) ||
+              setPicture(voirunSpaceshipPrev)
+          "
+        >
+          <img
+            class="SpaceshipNav"
+            src="./Black_and_Yellow_Spaceship_nbg_.png"
+            width="215"
+            height="192"
+          />
+        </a>
+      </div>
+
+      <div class="spaceshipPreview" id="spaceshipPreview">Hello</div>
+    </div>
+
+    <script>
+      // For spaceship cards
+      var classicstats = `<span style="font-size: 16px; font-family: '8bit-font-text'"> 
+        PRICE: Free 
+        <br> Speed: 7 
+        <br> Manueverability: 1
+        <br> Guns: 1x AstroPopper
+        <br> Cooldown: 1 second
+        <br> Fire modes: Single-shot
+        <br> Score Multiplier: 1
+        <br> Size: Medium
+        <br> <br> Write-up: This spaceship is... well... classic. Large and fast with no multiplier, it's not quite the best spaceship. But hey, it's free.</span> 
+        <br>
+        <br>`;
+
+      var classicEquipButton = `<button class="button buttonPurchase" onclick="setSelectedShipCookie(7, 1, '1ast', 1, 'single-shot', 50, 50, 1, 110, 90, './CODING_SPACESHIP_67ca5e7e29855.png', 'c') || shipEquiped(this)">Equip Ship</button>`;
+
+      //----------------------------------------------------------------
+
+      var pixproStats = `<span style="font-size: 16px; font-family: '8bit-font-text'"> 
+        PRICE: 20000PP 
+        <br> Speed: 7
+        <br> Manueverability: 1 
+        <br> Guns: 1x AstroPopper
+        <br> Cooldown: 1 second
+        <br> Fire modes: Single-shot
+        <br> Score Multiplier: 1.25
+        <br> Size: Medium
+        <br> Write-up: The Pixel Piece Prospector is just here for the money (and alliteration). It has nothing to boast of in performance, but it's score multiplier will get you cash-- fast!</span>`;
+
+      var pixproPurchaseButton = `<button id="pixproPurchaseButton" class="button buttonPurchase" onclick="purchaseAttempt(20000, 'pixpro')">Purchase Ship</button> <br>`;
+      var pixproEquipButton = `<br> <br> <button class="button buttonPurchase" onclick="setSelectedShipCookie(7, 1, '1ast', 1, 'single-shot', 50, 50, 1.25, 110, 90, './Green_Spaceship_nbg_.png', 'gs') || shipEquiped(this)">Equip Ship</button>`;
+
+      //----------------------------------------------------------------
+
+      var voirunStats = `<span style="font-size: 16px; font-family: '8bit-font-text'"> 
+        PRICE: 40000PP 
+        <br> Speed: 9 
+        <br> Manueverability: 2
+        <br> Guns: 2x AstroPopper
+        <br> Cooldown: 1 second
+        <br> Fire modes: Single-shot
+        <br> Score Multiplier: 1
+        <br> Size: Medium
+        <br> Write-up: The Void Runner is a fast stealth spaceship. Its speed is a double-edged sword-- high speed is hard to control, but will get you a high score faster. Equipped with two AstroPoppers, it can also deliver sufficient fire-power. </span> 
+        <br>
+        <br>`;
+
+      var voirunPurchaseButton = `<button id="voirunPurchaseButton" class="button buttonPurchase" onclick="purchaseAttempt(40000, 'voirun')">Purchase Ship</button>`;
+      var voirunEquipButton = `<br> <button class="button buttonPurchase" onclick="setSelectedShipCookie(8, 1, '2ast', 1, 'single-shot', 25, 25, 1, 110, 90, './Black_and_Yellow_Spaceship_nbg_.png', 'vr') || shipEquiped(this)">Equip Ship</button>`;
+
+      //----------------------------------------------------------------------
+
+      // For spaceship performance
+      let sensitivity = 2;
+
+      // For spaceship previews
+      var classicSpaceshipPrev = `<img class="shipPrev"       src="./CODING_SPACESHIP_67ca5e7e29855.png"    width="384" height="384">`;
+      var pieproSpaceshipsPrev = `<img class="shipPrev"       src="./Green_Spaceship_nbg_.png"              width="384" height="384">`;
+      var voirunSpaceshipPrev = `<img class="shipPrev"     src="./Black_and_Yellow_Spaceship_nbg_.png"   width="384" height="384">`;
+
+      // For game canvas
+      var myGamePiece;
+      var myObstacles = [];
+      var myBullets = [];
+      var myBarriers = [];
+      var myReinforcedBarriers = [];
+      var myScore;
+      var myObstacle;
+      var myBackground;
+      var myAmmo;
+      var myMags = [];
+
+      // Misc
+      var gameoverSound;
+      var backgroundIngame;
+
+      //------------------------------VARIABLES OVER-----------------------------//
+
+      function queryShipCookie() {
+        const array = getPurchasedShipsCookie();
+        if (array == null) {
+          setPurchasedShipsCookie('no', 'no', 'no');
+        }
+      }
+
+      function hideDiv(divID) {
+        var x = document.getElementById(divID);
+        x.style.display = 'none';
+      }
+
+      function showDiv(divID) {
+        var x = document.getElementById(divID);
+        x.style.display = 'block';
+      }
+
+      function setCard(ssName, ssStats) {
+        var x = document.getElementById('spaceshipName');
+        x.innerHTML = ssName;
+        var y = document.getElementById('spaceshipStats');
+        y.innerHTML = ssStats;
+        const array = getPurchasedShipsCookie();
+
+        if (array[0] !== 'yes' && ssName == 'Pixel Piece Prospecter') {
+          var y = document.getElementById('spaceshipStats');
+          y.innerHTML += pixproPurchaseButton;
+        } else if (array[1] !== 'yes' && ssName == 'Void Runner') {
+          var y = document.getElementById('spaceshipStats');
+          y.innerHTML += voirunPurchaseButton;
+        } else {
+          console.log('Spaceship is purchased');
+        }
+
+        if (
+          getSelectedShipCookie().at(11) !== 'gs' &&
+          ssName == 'Pixel Piece Prospecter'
+        ) {
+          addPixProEquip();
+        }
+
+        const array2 = getSelectedShipCookie();
+        if (getSelectedShipCookie().at(11) !== 'c' && ssName == 'CLASSIC') {
+          addClassicEquip();
+        }
+
+        if (
+          getSelectedShipCookie().at(11) !== 'vr' &&
+          ssName == 'Void Runner'
+        ) {
+          addVoiRunEquip();
+        }
+
+        console.log('setCard function called');
+      }
+
+      function specialClassic() {
+        const array2 = getPurchasedShipsCookie();
+        if (
+          getSelectedShipCookie().at(11) !== 'c' &&
+          ssName == 'CLASSIC' &&
+          array2.at(0) == 'no' &&
+          array2.at(1) == 'no' &&
+          array2.at(2) == 'no'
+        ) {
+          addClassicEquip();
+        }
+      }
+
+      function addPixProEquip() {
+        const array = getPurchasedShipsCookie();
+        if (array[0] == 'yes') {
+          x = document.getElementById('spaceshipStats');
+          x.innerHTML += pixproEquipButton;
+        }
+      }
+
+      function addVoiRunEquip() {
+        const array = getPurchasedShipsCookie();
+        if (array[1] == 'yes') {
+          x = document.getElementById('spaceshipStats');
+          x.innerHTML += voirunEquipButton;
+        }
+      }
+
+      function addClassicEquip() {
+        x = document.getElementById('spaceshipStats');
+        x.innerHTML += classicEquipButton;
+      }
+
+      function shipEquiped(e) {
+        e.style.display = 'none';
+      }
+
+      function setPicture(pictureName) {
+        var x = document.getElementById('spaceshipPreview');
+        x.innerHTML = pictureName;
+        console.log('setPicture function called');
+      }
+
+      function changebg() {
+        document.body.style.backgroundImage =
+          'url("./Screenshot_2025-04-28_162823.png")';
+      }
+
+      function changebgHome() {
+        document.body.style.backgroundImage = 'url("./Pixel_Space.png")';
+      }
+
+      function setScorebar() {
+        let pixelPieces = getScoreCookie();
+        let score_hangerBar = `<span style="font-size: 20px; float:right; padding-right: 70px; padding-top: 3px; color: white;">PIXEL PIECES: ${pixelPieces}</span>`;
+        document.getElementById('hangerBar').innerHTML =
+          `<button onclick="hideDiv('hanger') || showDiv('startScreen')" style="text-size: 16; font-family: '8bit-font-text'" class="backbuttonhangerbar">-BACK</button>` +
+          score_hangerBar;
+        console.log('setScorebar function called');
+      }
+
+      function addScore(score) {
+        let scorep = score * getSelectedShipCookie().at(7);
+        let scoref = scorep + getScoreCookie();
+        setScoreCookie(Math.round(scoref));
+        console.log('Score: ' + scoref);
+        setScorebar();
+      }
+
+      function purchaseAttempt(purchasePrice, shipName) {
+        if (getScoreCookie() >= purchasePrice) {
+          console.log('Purchase complete!');
+          let score = getScoreCookie() - purchasePrice;
+          setScoreCookie(Math.round(score));
+
+          if (shipName == 'pixpro') {
+            setPurchasedShipsCookie('yes', 'no', 'no');
+            addPixProEquip();
+            var x = document.getElementById('pixproPurchaseButton');
+            x.style.display = 'none';
+          }
+
+          if (shipName == 'voirun') {
+            array = getPurchasedShipsCookie();
+            if (array[0] == 'yes') {
+              setPurchasedShipsCookie('yes', 'yes', 'no');
+            }
+            if (array[0] == 'no') {
+              setPurchasedShipsCookie('no', 'yes', 'no');
+            }
+            addVoiRunEquip();
+            var x = document.getElementById('voirunPurchaseButton');
+            x.style.display = 'none';
+          }
+        } else {
+          purchaseAttemptFailed(purchasePrice);
+          console.log('Purchase impossible.');
+        }
+        setScorebar();
+      }
+
+      function purchaseAttemptFailed(price) {
+        var x = document.getElementById('overlay');
+        x.style.display = 'block';
+        var y = document.getElementById('purchaseDialog');
+        y.style.display = 'block';
+        let pixelPieces = getScoreCookie();
+        let priceOfSpaceship = price;
+        let needPixelPieces = price - pixelPieces;
+        let dialogHeader = `<span style="font-size: 40px; color: white;">Purchase Attempt Failed <br> <br> </span>`;
+        let dialogContent = `<span style="font-size: 20px; color: white;">You need ${needPixelPieces} more Pixel Pieces.</span>`;
+        let dialog = dialogHeader + dialogContent;
+        y.innerHTML =
+          dialog +
+          `<button onclick="hideDiv('overlay') || hideDiv('purchaseDialog')" style="font-size: 20; font-family: '8bit-font-text'" class="backbuttondialog" id="bactbuttondialog">BACK</button>`;
+      }
+
+      //--------------------------SETTING COOKIES---------------------//
+
+      function setScoreCookie(score) {
+        document.cookie = `score=${score}; expires=Thu, 18 Dec 2099 12:00:00 UTC; path=/;`;
+      }
+
+      function getScoreCookie() {
+        const cookieName = 'score=';
+        const allCookies = document.cookie.split(';');
+
+        for (let i = 0; i < allCookies.length; i++) {
+          let cookie = allCookies[i].trim();
+          if (cookie.indexOf(cookieName) === 0) {
+            return parseInt(cookie.substring(cookieName.length));
+          }
+        }
+
+        return 0;
+      }
+
+      function setSelectedShipCookie(
+        speed,
+        sensitivity,
+        guns,
+        cooldown,
+        fireModes,
+        gunPosX,
+        gunPosY,
+        multiplier,
+        width,
+        height,
+        url,
+        ship,
+      ) {
+        const shipDetails = `${speed}|${sensitivity}|${guns}|${cooldown}|${fireModes}|${gunPosX}|${gunPosY}|${multiplier}|${width}|${height}|${url}|${ship}`;
+
+        document.cookie = `selectedShip=${shipDetails}; expires=Thu, 18 Dec 2099 12:00:00 UTC; path=/`;
+        console.log('Selected ship cookie set to ' + shipDetails);
+      }
+
+      function getSelectedShipCookie() {
+        const selectedShipCookieName = 'selectedShip=';
+        const allCookies = document.cookie.split(';');
+        const standard = [
+          7,
+          1,
+          '1ast',
+          1,
+          'single-shot',
+          50,
+          1,
+          110,
+          90,
+          './CODING_SPACESHIP_67ca5e7e29855.png',
+          'c',
+        ];
+
+        for (let i = 0; i < allCookies.length; i++) {
+          let cookie = allCookies[i].trim();
+          if (cookie.indexOf(selectedShipCookieName) === 0) {
+            const shipDetails = cookie.substring(selectedShipCookieName.length);
+            const shipParams = shipDetails.split('|');
+
+            return shipParams;
+          }
+        }
+
+        return standard;
+      }
+
+      function setSpaceshipsCookie(spaceShips) {
+        document.cookie = `spaceships=${spaceShips}; path=/`;
+      }
+
+      function getSpaceshipsCookie() {
+        const cookie = document.cookie.match(/(^|;)\s*spaceships=([^;]+)/);
+        return cookie ? cookie[2].split(',') : [];
+      }
+
+      // remember to set parameters for new ships. use if statements to figure what ships have already been purchased, then assign values to parameters
+
+      function setPurchasedShipsCookie(pixpro, voirun, ship3) {
+        const ships = `${pixpro}|${voirun}|${ship3}`;
+
+        document.cookie = `purchasedShips=${ships}; path=/`;
+        console.log('Purchased ships ' + ships);
+      }
+
+      function getPurchasedShipsCookie() {
+        const purchasedShipCookie = 'purchasedShips=';
+        const allCookies = document.cookie.split(';');
+
+        for (let i = 0; i < allCookies.length; i++) {
+          let cookie = allCookies[i].trim();
+          if (cookie.indexOf(purchasedShipCookie) === 0) {
+            const purchasedShipsRaw = cookie.substring(
+              purchasedShipCookie.length,
+            );
+            const purchasedShips = purchasedShipsRaw.split('|');
+
+            return purchasedShips;
+          }
+        }
+
+        return null;
+      }
+
+      //--------------------------- GAME MECHANICS UNDERNEATH ----------------------------------//
+
+      function startGame() {
+        myGamePiece = new component(
+          Number(getSelectedShipCookie().at(8)),
+          Number(getSelectedShipCookie().at(9)),
+          getSelectedShipCookie().at(10),
+          4,
+          500,
+          'image',
+          'gamePiece',
+          'n/a',
+        );
+        myScore = new component(
+          '30px',
+          '8bit-font-text',
+          '#33ff33',
+          280,
+          40,
+          'text',
+          'n/a',
+          'n/a',
+        );
+        myAmmo = new component(
+          '30px',
+          '8bit-font-text',
+          '#33ff33',
+          800,
+          40,
+          'text',
+          'n/a',
+          'n/a',
+        );
+        myAmmo.text = 'Ammo: 8/8';
+        myObstacle = new component(
+          30,
+          20,
+          'black',
+          10,
+          0,
+          'obstacle',
+          'n/a',
+          'n/a',
+        );
+        myBackground = new component(
+          2115,
+          1000,
+          './Pixel_Space.png',
+          0,
+          0,
+          'background',
+          'n/a',
+          'n/a',
+        );
+        myGameArea.start();
+        stopMenuMusic();
+        gameoverSound = new sound(
+          'https://github.com/MulletMan11/Source-Files/raw/refs/heads/main/gameover_pp.wav',
+          'effect',
+        );
+        shootingSound = new sound(
+          './pp_shooting_sound_-_Made_with_Clipchamp_20250429174235.mp3',
+          'effect',
+        );
+        pickUpSound = new sound('./pp_pickup.mp3', 'effect');
+        backgroundIngame = new sound(
+          'https://github.com/MulletMan11/Source-Files/raw/refs/heads/main/Pixel_Pilot_draft_1.mp3',
+          'ingame',
+        );
+        ('hideButtons()');
+        changebg();
+        backgroundIngame.play();
+      }
+
+      function restartGame() {
+        myGameArea.stop();
+        myGamePiece.ammo = 8;
+        firstShot = true;
+        myGamePiece = null;
+        myObstacles = [];
+        myBarriers = [];
+        myReinforcedBarriers = [];
+        myBullets = [];
+        myScore = null;
+        myObstacle = null;
+        myBackground = null;
+        myAmmo = null;
+        myGameArea.context.clearRect(
+          0,
+          0,
+          myGameArea.canvas.width,
+          myGameArea.canvas.height,
+        );
+        hideDiv('endScreen');
+        startGame();
+        setEndScreen();
+      }
+
+      var myGameArea = {
+        canvas: document.createElement('canvas'),
+        start: function () {
+          this.canvas.width = Number(window.innerWidth) - 15;
+          this.canvas.height = Number(window.innerHeight) - 40;
+          this.context = this.canvas.getContext('2d');
+          document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+          this.frameNo = 0;
+          console.log('Canvas height set to ' + this.canvas.height);
+          this.interval = setInterval(updateGameArea, 5);
+
+          window.addEventListener('keydown', function (e) {
+            myGameArea.key = e.keyCode;
+          });
+          window.addEventListener('keyup', function (e) {
+            myGameArea.key = false;
+          });
+        },
+
+        clear: function () {
+          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+        stop: function () {
+          clearInterval(this.interval);
+        },
+      };
+
+      function component(
+        width,
+        height,
+        color,
+        x,
+        y,
+        type,
+        secondaryType,
+        healthpoints,
+      ) {
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.x = x;
+        this.y = y;
+        this.healthpoints = healthpoints;
+        this.update = function () {
+          //Updates that happen every new frame
+          ctx = myGameArea.context;
+
+          if (type == 'image' || type == 'background') {
+            this.image = new Image();
+            this.image.src = color;
+          }
+
+          if (secondaryType == 'gamePiece') {
+            this.gunType = getSelectedShipCookie().at(2);
+            this.cooldown = getSelectedShipCookie().at(3);
+            this.fireModes = getSelectedShipCookie().at(4);
+            this.gunPosX = getSelectedShipCookie().at(5);
+            this.gunPosY = getSelectedShipCookie().at(6);
+          }
+
+          if (secondaryType == 'Trobstacle') {
+            this.heighR = 0;
+            this.gapR = 0;
+          }
+
+          if (this.type == 'text') {
+            ctx.font = "30px '8bit-font-text', sans-serif";
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+          }
+
+          if (type == 'image') {
+            ctx.drawImage(
+              this.image,
+              this.x,
+              this.y,
+              this.width + 15,
+              this.height + 15,
+            );
+          }
+
+          if (type == 'background') {
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            ctx.drawImage(
+              this.image,
+              this.x + this.width,
+              this.y,
+              this.width,
+              this.height,
+            );
+          }
+
+          if (type == 'obstacles' || type == 'bullets') {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+          }
+        };
+
+        this.newPos = function () {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.type == 'background') {
+            if (this.x == -this.width) {
+              this.x = 0;
+            }
+          }
+
+          this.hitBottom();
+          this.hitTop();
+        };
+
+        this.hitBottom = function () {
+          var rockbottom = myGameArea.canvas.height - this.height;
+          if (this.y > rockbottom) {
+            this.y = rockbottom;
+          }
+        };
+
+        this.hitTop = function () {
+          var maxScreenHeight = -10;
+          if (this.y < maxScreenHeight) {
+            this.y = maxScreenHeight;
+          }
+        };
+
+        this.crashWith = function (otherobj) {
+          var myleft = this.x;
+          var myright = this.x + this.width;
+          var mytop = this.y;
+          var mybottom = this.y + this.height;
+          var otherleft = otherobj.x;
+          var otherright = otherobj.x + otherobj.width;
+          var othertop = otherobj.y;
+          var otherbottom = otherobj.y + otherobj.height;
+          var crash = true;
+          if (
+            mybottom < othertop ||
+            mytop > otherbottom ||
+            myright < otherleft ||
+            myleft > otherright
+          ) {
+            crash = false;
+          }
+          if (
+            this == myGamePiece &&
+            otherobj == myObstacles[i] &&
+            crash &&
+            !this.crashed
+          ) {
+            this.crashed = true;
+            this.onCrash();
+          }
+          if (
+            this == myGamePiece &&
+            otherobj == myBarriers[z] &&
+            crash &&
+            !this.crashed
+          ) {
+            this.crashed = true;
+            this.onCrash();
+          }
+          if (
+            this == myGamePiece &&
+            otherobj == myReinforcedBarriers[z] &&
+            crash &&
+            !this.crashed
+          ) {
+            this.crashed = true;
+            this.onCrash();
+          }
+          return crash;
+        };
+
+        this.onCrash = function () {
+          backgroundIngame.stop();
+          gameoverSound.play();
+          showDiv('endScreen');
+          setEndScreen();
+          setScorebar();
+          console.log('sensitivity is ' + sensitivity);
+        };
+      }
+
+      function setEndScreen() {
+        let end_score_value =
+          (myGameArea.frameNo / 4) * getSelectedShipCookie().at(7);
+        let end_score_value_rounded = Math.round(end_score_value);
+        let score_end = `<span style="font-size: 20px; font-family: '8bit-font-text'">Your score: ${end_score_value}</span>`;
+        let overall_score = end_score_value + getScoreCookie();
+        let previous_score = getScoreCookie();
+        let score_end_adding = `<span style="font-size: 20px; font-family: '8bit-font-text'"><br><br>${end_score_value} (this game score) + ${previous_score} (score from previous games) = ${overall_score} (overall score)</span>`;
+        let score_end_refresh = ` <br> <br> <button style="font-family: '8bit-font-text'" class="restartGameButton" onclick="restartGame()">Restart Game</button> <button style="font-family: '8bit-font-text'" class="goHomeButton" onclick="goHome()">Go to Main Menu</button> <br> <br>`;
+        let game_over_screen = `<span style="font-size: 60px; font-family: '8bit-font-text'">GAME OVER</span> <br> <span style="font-size: 20px">You crashed.</span> <br> <br>`;
+        let content_for_end_screen =
+          game_over_screen + score_end + score_end_adding + score_end_refresh;
+        addScore(end_score_value);
+        document.getElementById('endScreen').innerHTML = content_for_end_screen;
+      }
+
+      function goHome() {
+        showDiv('startScreen');
+        myGameArea.stop();
+        myGamePiece.ammo = null;
+        firstShot = true;
+        myGamePiece = null;
+        myObstacles = [];
+        myBullets = [];
+        myBarriers = [];
+        myReinforcedBarriers = [];
+        myScore = null;
+        myAmmo = null;
+        myObstacle = null;
+        myBackground = null;
+        myGameArea.context.clearRect(
+          0,
+          0,
+          myGameArea.canvas.width,
+          myGameArea.canvas.height,
+        );
+        hideDiv('endScreen');
+        changebgHome();
+        document.body.removeChild(myGameArea.canvas);
+      }
+
+      function updateGameArea() {
+        var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+        for (i = 0; i < myObstacles.length; i += 1) {
+          if (myGamePiece.crashWith(myObstacles[i])) {
+            myGameArea.stop();
+            return;
+          }
+        }
+
+        myGameArea.clear();
+        myBackground.speedX = -1;
+        myGameArea.frameNo += 1;
+        myGamePiece.speedX = 0;
+        myGamePiece.speedY = 0;
+        if (
+          (myGameArea.key && myGameArea.key == 38) ||
+          (myGameArea.key && myGameArea.key == 87)
+        ) {
+          myGamePiece.speedY = -Number(getSelectedShipCookie().at(1));
+        }
+        if (
+          (myGameArea.key && myGameArea.key == 40) ||
+          (myGameArea.key && myGameArea.key == 83)
+        ) {
+          myGamePiece.speedY = Number(getSelectedShipCookie().at(1));
+        }
+        if (everyinterval(600)) {
+          x = myGameArea.canvas.width;
+          minHeight = 300;
+          maxHeight = 700;
+          myObstacles.heightR = Math.floor(
+            Math.random() * (maxHeight - minHeight + 1) + minHeight,
+          );
+          minGap = 175;
+          maxGap = 300;
+          myObstacles.gapR = Math.floor(
+            Math.random() * (maxGap - minGap + 1) + minGap,
+          );
+          myObstacles.push(
+            new component(
+              10,
+              myObstacles.heightR,
+              '#FF3F3F',
+              x,
+              0,
+              'obstacles',
+              'Trobstacle',
+              'n/a',
+            ),
+          );
+          myObstacles.push(
+            new component(
+              10,
+              x - myObstacles.heightR - myObstacles.gapR,
+              '#FF3F3F',
+              x,
+              myObstacles.heightR + myObstacles.gapR,
+              'obstacles',
+              'Trobstacle',
+              'n/a',
+            ),
+          );
+        }
+
+        if (everyinterval(600)) {
+          myBarriers.push(
+            new component(
+              10,
+              100,
+              'orange',
+              x,
+              myObstacles.heightR + 50,
+              'obstacles',
+              'n/a',
+              25,
+            ),
+          );
+        }
+
+        if (everyinterval(1200)) {
+          myReinforcedBarriers.push(
+            new component(
+              10,
+              100,
+              'blue',
+              x + 10,
+              myObstacles.heightR + 50,
+              'obstacles',
+              'reinforced',
+              50,
+            ),
+          );
+        }
+
+        magInterval = Math.floor(Math.random() * 1200) + 601;
+        random200 = Math.floor(Math.random() * 200) + 1;
+        randomGap =
+          Math.floor(Math.random() * (myObstacles.heightR + myObstacles.gapR)) +
+          myObstacles.heightR;
+        if (everyinterval(600)) {
+          myMags.push(
+            new component(
+              10,
+              10,
+              'yellow',
+              x - random200,
+              randomGap,
+              'obstacles',
+              'n/a',
+              'n/a',
+            ),
+          );
+        }
+
+        myBackground.newPos();
+        myBackground.update();
+        for (i = 0; i < myObstacles.length; i += 1) {
+          myObstacles[i].x += -3; //Speed at which obstacles move
+          myObstacles[i].update();
+        }
+        for (i = 0; i < myBarriers.length; i += 1) {
+          myBarriers[i].x += -3; //Speed at which barriers move
+          myBarriers[i].update();
+        }
+        for (i = 0; i < myReinforcedBarriers.length; i += 1) {
+          myReinforcedBarriers[i].x += -3; //Speed at which barriers move
+          myReinforcedBarriers[i].update();
+        }
+        for (i = 0; i < myMags.length; i += 1) {
+          myMags[i].x += -3; //Speed at which barriers move
+          myMags[i].update();
+        }
+
+        myGamePiece.newPos();
+        myGamePiece.update();
+        myScore.text =
+          'SCORE: ' +
+          Math.round((myGameArea.frameNo / 4) * getSelectedShipCookie().at(7));
+        myScore.update();
+        myAmmo.update();
+        myObstacle.update();
+
+        for (j = 0; j < myBullets.length; j += 1) {
+          for (k = 0; k < myBarriers.length; k += 1) {
+            if (myBullets[j].crashWith(myBarriers[k])) {
+              myBarriers.splice(k, 1);
+              myBullets.splice(j, 1);
+            }
+          }
+        }
+
+        for (j = 0; j < myBullets.length; j += 1) {
+          for (k = 0; k < myReinforcedBarriers.length; k += 1) {
+            if (myBullets[j].crashWith(myReinforcedBarriers[k])) {
+              myReinforcedBarriers.healthpoints = -25;
+              if ((myReinforcedBarriers.healthpoints = 0)) {
+                myReinforcedBarriers.splice(k, 1);
+                myBullets.splice(j, 1);
+              }
+            }
+          }
+        }
+
+        for (z = 0; z < myReinforcedBarriers.length; z += 1) {
+          if (myGamePiece.crashWith(myReinforcedBarriers[z])) {
+            myGameArea.stop();
+            console.log('Spaceship hit barrier.');
+            return;
+          }
+        }
+
+        for (j = 0; j < myBullets.length; j += 1) {
+          for (k = 0; k < myObstacles.length; k += 1) {
+            if (myBullets[j].crashWith(myObstacles[k])) {
+              myBullets.splice(j, 1);
+            }
+          }
+        }
+        for (z = 0; z < myBarriers.length; z += 1) {
+          if (myGamePiece.crashWith(myBarriers[z])) {
+            myGameArea.stop();
+            console.log('Spaceship hit barrier.');
+            return;
+          }
+        }
+
+        for (z = 0; z < myMags.length; z += 1) {
+          if (myGamePiece.crashWith(myMags[z])) {
+            myMags.splice(z, 1);
+
+            if (myGamePiece.ammo < 8) {
+              let ammoToAdd = Math.min(5, 8 - myGamePiece.ammo);
+              myGamePiece.ammo += ammoToAdd;
+            }
+
+            ammoLeftD = myGamePiece.ammo;
+            myAmmo.text = 'Ammo: ' + ammoLeftD + '/8';
+            myAmmo.update();
+            pickUpSound.play();
+          }
+        }
+
+        for (i = 0; i < myBullets.length; i += 1) {
+          myBullets[i].x += 5; //Speed at which bullets move
+          myBullets[i].update();
+        }
+      }
+
+      function everyinterval(n) {
+        if ((myGameArea.frameNo / n) % 1 == 0) {
+          return true;
+        }
+        return false;
+      }
+
+      // For shooting
+      document.addEventListener('keydown', keyDownHandler);
+      document.addEventListener('keyup', keyUpHandler);
+
+      var spaceDown = false;
+      var lastShotTime = 0;
+      var firstShot = true;
+      function keyDownHandler(e) {
+        if (
+          e.key == ' ' &&
+          spaceDown == false &&
+          Date.now() - lastShotTime >= 1000
+        ) {
+          spaceDown = true;
+          console.log(spaceDown);
+
+          if (firstShot == true) {
+            firstShot = false;
+            myGamePiece.ammo = 8;
+          }
+
+          if (myGamePiece.ammo >= 1) {
+            myAmmo.update();
+            lastShotTime = Date.now();
+            shootingSound.stop();
+            shootingSound.play();
+
+            if (getSelectedShipCookie().at(2).includes('1')) {
+              myBullets.push(
+                new component(
+                  30,
+                  7,
+                  'yellow',
+                  myGamePiece.x + 110,
+                  myGamePiece.y + Number(myGamePiece.gunPosY),
+                  'bullets',
+                  'n/a',
+                  'n/a',
+                ),
+              );
+              ammoLeftD = myGamePiece.ammo - 1;
+              myGamePiece.ammo = ammoLeftD;
+              myAmmo.text = 'Ammo: ' + ammoLeftD + '/8';
+            }
+
+            if (getSelectedShipCookie().at(2).includes('2')) {
+              myBullets.push(
+                new component(
+                  30,
+                  7,
+                  'yellow',
+                  myGamePiece.x + 110,
+                  myGamePiece.y + Number(myGamePiece.gunPosY) - 7,
+                  'bullets',
+                  'n/a',
+                  'n/a',
+                ),
+              );
+              myBullets.push(
+                new component(
+                  30,
+                  7,
+                  'yellow',
+                  myGamePiece.x + 110,
+                  myGamePiece.y + Number(myGamePiece.gunPosY) + 55,
+                  'bullets',
+                  'n/a',
+                  'n/a',
+                ),
+              );
+              ammoLeftD = myGamePiece.ammo - 2;
+              myGamePiece.ammo = ammoLeftD;
+              myAmmo.text = 'Ammo: ' + ammoLeftD + '/8';
+            }
+          } else {
+            console.log('fawrhgdfvs');
+          }
+        }
+      }
+
+      function keyUpHandler(e) {
+        if (e.key == ' ') {
+          spaceDown = false;
+          console.log(spaceDown);
+        }
+      }
+
+      // End of for shooting
+
+      // Audio
+
+      menuMusic = new sound(
+        'https://github.com/MulletMan11/Source-Files/raw/refs/heads/main/A_Happy_FX_Tune_I_Call_Flitting_Chinchillas.mp3',
+        'menu',
+      );
+
+      function sound(src, type) {
+        this.sound = document.createElement('audio');
+        this.sound.src = src;
+        this.sound.setAttribute('preload', 'auto');
+        this.sound.setAttribute('controls', 'none');
+        if (type == 'menu') {
+          this.sound.setAttribute('loop', 'none');
+        }
+        this.sound.style.display = 'none';
+        document.body.appendChild(this.sound);
+        this.play = function () {
+          this.sound.play();
+        };
+        this.stop = function () {
+          this.sound.pause();
+        };
+      }
+
+      // Plays music as soon as browser allows.
+      window.addEventListener('click', function () {
+        playMenuMusic();
+      });
+
+      // See if music is playing. Returns true if audio is not paused or ended.
+      function isMusicPlaying(audio) {
+        return !audio.paused && !audio.ended;
+      }
+
+      function playMenuMusic() {
+        console.log('Menu music function called.');
+        try {
+          if (isMusicPlaying(backgroundIngame.sound)) {
+            console.log(
+              'Menu music is not playing because game has been initiated.',
+            );
+          } else {
+            menuMusic.play();
+          }
+        } catch {
+          menuMusic.play();
+        }
+      }
+
+      function stopMenuMusic() {
+        try {
+          menuMusic.stop();
+        } catch (err) {
+          console.log('stopping menu music error caught');
+        }
+        console.log('Menu music pause called.');
+      }
+
+      const audioCtx = new AudioContext();
+
+      function hoverSound() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(
+          700,
+          audioCtx.currentTime + 0.08,
+        );
+
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          audioCtx.currentTime + 0.12,
+        );
+
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      }
+
+      // Select all buttons on the page
+      const buttons = document.querySelectorAll('button');
+
+      // Add hover listeners
+      buttons.forEach((btn) => {
+        btn.addEventListener('mouseenter', () => {
+          console.log('Hovered:', btn.textContent);
+          hoverSound(); // play your sound here
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          console.log('Stopped hovering:', btn.textContent);
+        });
+      });
+
+      // end of audio
+      //------------------------End of Game Mechanics-------------------//
+    </script>
+  </body>
+</html>
