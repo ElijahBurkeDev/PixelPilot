@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  background-color: tan;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #393E41;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #393E41;
+}
+
+.active {
+  background-color: #34B4EB;
+}
+
+.quoteHeader {
+  height: 400px;
+  background-color: beige;
+  color: #393E41;
+  position: fixed;
+  top: 250px;
+  left: 500px;
+  margin: auto;
+  width: 50%;
+  border: 3px solid #393E41;
+  padding: 10px;
+  font-family: Brush Script MT, cursive;
+  text-align: center;
+  font-size: large;
+}
+
+.quote {
+  color: #393E41;
+  font-family: Brush Script MT, cursive;
+  position: fixed;
+  top: 350px;
+  left: 500px;
+  width: 50%;
+  text-align: center;
+
+}
