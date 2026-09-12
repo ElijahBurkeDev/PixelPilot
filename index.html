@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8">
   <title>Pixel Pilot</title>
-  <link rel="icon" type="image/x-icon" href="./ppfavicon.ico">
+  <link rel="icon" type="image/x-icon" href="./images/ppfavicon.ico">
 </head>
 
 <body
@@ -2400,7 +2400,7 @@ function updateGameArea(delta = 1) {
   else                              myGamePiece.tiltTarget =  0;
   myGamePiece.tiltAngle += (myGamePiece.tiltTarget - myGamePiece.tiltAngle) * 0.08;
 
-  if (everyinterval(200)) {
+  if (everyinterval(300)) {
     x = GAME_WIDTH;
 
     if (myObstacles.spawnCount === undefined) myObstacles.spawnCount = 0;
@@ -2455,7 +2455,7 @@ function updateGameArea(delta = 1) {
     ? Math.floor(Math.random() * myObstacles.gapR) + myObstacles.heightR
     : GAME_HEIGHT / 2;
 
-  if (everyinterval(200)) {
+  if (everyinterval(600)) {
     myMags.push(new component(10, 10, "./images/ammo_v1.png", GAME_WIDTH - random200, randomGap, "n/a", "mag", "n/a"));
   }
 
@@ -2609,7 +2609,9 @@ function sound(src, type) {
   this.sound.style.display = "none";
   document.body.appendChild(this.sound);
   this.play = function() {
-    this.sound.volume = settingsSfxVol;
+    if (type !== 'menu') {
+      this.sound.volume = settingsSfxVol;
+    }
     this.sound.play();
   };
   this.stop = function() { this.sound.pause(); };
@@ -2968,7 +2970,9 @@ function buildSettingsPanel() {
     <p style="font-size: 20px; font-family: '8bit-font-text'">-New menu music.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Somewhat cleaned up code.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Score and Ammo HUD now scale with webpage and are no longer drawn on the canvas.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Canvas should now scale dynamically to different screen ratios, sizes, and browser zooms.</p>    
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Canvas should now scale dynamically to different screen ratios, sizes, and browser zooms.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Migrated to different subdomain.</p>   
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Organized game assests.</p>   
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('changelog') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
 
