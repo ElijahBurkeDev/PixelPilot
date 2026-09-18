@@ -290,6 +290,7 @@ function getHighScore() {
   const c = document.cookie.match(/(^|;)\s*highScore=([^;]+)/);
   return c ? parseInt(c[2]) : 0;
 }
+
 function setHighScore(score) {
   if (score > getHighScore()) {
     document.cookie = `highScore=${score}; expires=Thu, 18 Dec 2099 12:00:00 UTC; path=/`;

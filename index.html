@@ -9,7 +9,7 @@
 </head>
 
 <body
-  onload="queryShipCookie() || setScorebar() || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats)">
+  onload="queryShipCookie() || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats) || console.log('onload called')">
   <style>
 
     @font-face {
@@ -1419,7 +1419,7 @@
     <div class="purchaseDialog" id="purchaseDialog"></div>
     <div class="overlay" id="overlay"></div>
 
-    <div class="hangerBar" id="hangerBar"></div>
+    <div class="hangerBar" id="hangerBar" onclick="setScorebar()"></div>
 
     <div class="shipInfoContainer">
       <div class="spaceshipStats" id="spaceshipStats"></div>
