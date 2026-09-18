@@ -1014,6 +1014,23 @@ function queryShipCookie() {
   }
 }
 
+function initializePage() {
+  queryShipCookie();
+  setScorebar();
+  setPicture(classicSpaceshipPrev);
+  setCard('CLASSIC', classicstats);
+}
+
+function openHangar() {
+  hideDiv('startScreen');
+  showDiv('hanger');
+  setScorebar();
+  setPicture(classicSpaceshipPrev);
+  setCard('CLASSIC', classicstats);
+}
+
+document.addEventListener('DOMContentLoaded', initializePage);
+
 //--------------------------- GAME MECHANICS UNDERNEATH ----------------------------------//
 
 function startGame() {
