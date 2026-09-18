@@ -14,15 +14,15 @@
 
     @font-face {
       font-family: '8bit-font';
-      src: url('./fonts/PressStart2P-vaV7.ttf') format('woff2'),
-        font-weight: normal;
+      src: url('./fonts/PressStart2P-vaV7.ttf') format('woff2');
+      font-weight: normal;
       font-style: normal;
     }
 
     @font-face {
       font-family: '8bit-font-text';
-      src: url('./fonts/ConnectionSerif-d20X.otf') format('woff2'),
-        font-weight: normal;
+      src: url('./fonts/ConnectionSerif-d20X.otf') format('woff2');
+      font-weight: normal;
       font-style: normal;
     }
 
@@ -498,6 +498,8 @@
     }
 
     .hangerBar {
+      display: flex;
+      align-items: center;
       overflow: hidden;
       background-color: #1a0808;
       border-style: solid;
@@ -505,12 +507,21 @@
     }
 
     .hangerBar a {
-      float: left;
       color: #e03a3a;
       text-align: center;
       padding: 14px 16px;
       text-decoration: none;
       font-size: 17px;
+    }
+
+    .hangerBar > span {
+      float: none !important;
+      margin-left: auto;
+      padding-right: clamp(12px, 4vw, 70px) !important;
+      padding-top: 3px !important;
+      white-space: nowrap;
+      text-align: right;
+      font-size: clamp(13px, 2vw, 20px) !important;
     }
 
     .spaceshipSelector {
@@ -570,6 +581,8 @@
       font-size: 30px;
     }
 
+/*
+
     .spaceshipPreview {
       background-color: #0f0f14;
       border-style: solid;
@@ -577,8 +590,6 @@
       position: absolute;
       top: 100px;
       left: 700px;
-      width: 1135px;
-      height: 500px;
       margin: auto;
       color: #c8c8d0;
       text-align: center;
@@ -586,16 +597,22 @@
       overflow: hidden;
     }
 
+*/
+
     /* ── SHIP PREVIEW FLOAT ANIMATION ── */
     @keyframes shipFloat {
-      0%, 100% { transform: translateY(-50%) translateY(0px); }
-      50%       { transform: translateY(-50%) translateY(-18px); }
+      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+      50%       { transform: translate(-50%, -50%) translateY(-18px); }
     }
     .shipPrev {
       position: absolute;
       top: 50%;
-      left: 35%;
-      transform: translateY(-50%);
+      left: 50%;
+      width: auto;
+      height: auto;
+      max-width: calc(100% - 100px);
+      max-height: calc(100% - 100px);
+      object-fit: contain;
       display: block;
       animation: shipFloat 3s ease-in-out infinite;
       filter: drop-shadow(0 0 18px rgba(232, 200, 74, 0.35));
@@ -669,23 +686,6 @@
       position: absolute;
       left: 525px;
       top: 20px;
-    }
-
-    /* ── UPDATE BADGE ── */
-    .updateTitle {
-      font-size: 40px;
-      font-family: '8bit-font-text';
-      position: absolute;
-      left: 1500px;
-      top: 20px;
-      rotate: 15deg;
-      background-color: #1a0a00;
-      color: #e8702a;
-      border: 2px solid #b85500;
-      border-radius: 16px;
-      width: 300px;
-      padding: 16px 16px;
-      text-align: center;
     }
 
     /* ── SPLASH TEXT ── */
@@ -796,6 +796,23 @@
     }
     #touchFireBtn:active { background: rgba(224,58,58,0.55); }
 
+    #portraitGameBlocker {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      background: rgba(8, 8, 12, 0.96);
+      color: #e8c84a;
+      text-align: center;
+      font-family: '8bit-font-text';
+      font-size: clamp(18px, 5vw, 32px);
+      line-height: 1.5;
+    }
+
     /* ── HIGH SCORE BADGE (in-game HUD) ── */
     #highScoreHUD {
       position: fixed;
@@ -836,16 +853,365 @@
         text-shadow: 1px 1px #1a0a00;
       }
 
+      /* Responsive panels and hangar layout */
+      .howPlay,
+      .changeLog {
+        width: min(700px, calc(100vw - 32px));
+        max-height: calc(100vh - 32px);
+        box-sizing: border-box;
+        padding: clamp(16px, 3vw, 32px) clamp(16px, 4vw, 32px);
+      }
+
+      #settings {
+        width: min(700px, calc(100vw - 32px)) !important;
+      }
+
+      .gameEnd,
+      .pauseScreen {
+        width: min(520px, calc(100vw - 24px));
+        max-height: calc(100vh - 24px);
+        box-sizing: border-box;
+        padding: clamp(14px, 3vw, 28px) clamp(14px, 4vw, 28px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .pauseScreen p {
+        overflow-wrap: anywhere;
+      }
+
+      .gameEnd .restartGameButton,
+      .gameEnd .goHomeButton,
+      .pauseScreen .restartGameButton,
+      .pauseScreen .goHomeButton {
+        max-width: 100%;
+        padding: clamp(10px, 2vw, 16px) clamp(12px, 3vw, 20px);
+        font-size: clamp(16px, 3vw, 24px);
+      }
+
+      .howPlay > p:first-child,
+      .changeLog > p:first-child,
+      #settings > p:first-child {
+        font-size: clamp(30px, 7vw, 60px) !important;
+        line-height: 1.15;
+      }
+
+      .howPlay p,
+      .changeLog p,
+      #settings p {
+        overflow-wrap: anywhere;
+      }
+
+      .howPlay .button_hp,
+      .changeLog .button_hp,
+      #settings .button_hp {
+        width: min(100%, 420px);
+        box-sizing: border-box;
+        padding: clamp(10px, 2vw, 16px) 20px;
+        font-size: clamp(20px, 4vw, 40px);
+      }
+
+      .hanger {
+        --selector-height: clamp(200px, 28vh, 300px);
+        --card-bottom-gap: clamp(32px, 6vh, 80px);
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+
+      .hangerBar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .spaceshipName {
+        position: static;
+        grid-area: name;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: clamp(20px, 2.5vw, 30px);
+      }
+
+      .spaceshipStats {
+        position: static;
+        grid-area: stats;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      .spaceshipPreview {
+        position: static;
+        grid-area: preview;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;           
+        display: grid;
+        place-items: center;
+      }
+
+      @keyframes shipFloatInCard {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-18px); }
+      }
+
+      .spaceshipPreview .shipPrev {
+        position: static;
+        width: auto;
+        height: auto;
+        max-width: calc(100% - 90px);
+        max-height: calc(100% - 90px);
+        transform: none;
+        animation: shipFloatInCard 3s ease-in-out infinite;
+      }
+
+      .shipInfoContainer {
+        position: absolute;
+        top: 82px;
+        left: clamp(16px, 3vw, 50px);
+        right: clamp(16px, 3vw, 50px);
+        bottom: calc(var(--selector-height) + var(--card-bottom-gap));
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        grid-template-areas:
+          "name preview"
+          "stats preview";
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .spaceshipSelector {
+        width: 100%;
+        height: var(--selector-height);
+        min-height: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .spaceshipSelector a {
+        float: none;
+      }
+
+      .spaceshipSelector img {
+        width: clamp(100px, 16vw, 215px);
+        height: auto;
+      }
+
+      @media (max-width: 500px) {
+        .hanger {
+          --selector-height: 120px;
+        }
+
+        .howPlay,
+        .changeLog {
+          max-height: calc(100vh - 20px);
+          width: calc(100vw - 20px);
+          padding: 14px 16px;
+          line-height: 1.35;
+        }
+
+        .gameEnd,
+        .pauseScreen {
+          width: calc(100vw - 20px);
+          max-height: calc(100vh - 20px);
+          padding: 12px 14px;
+        }
+
+        .gameEnd .grade-badge {
+          font-size: clamp(42px, 14vw, 70px) !important;
+          padding: 4px 16px;
+        }
+
+        .gameEnd .tier-label {
+          font-size: clamp(16px, 5vw, 22px) !important;
+          letter-spacing: 1px;
+        }
+
+        .howPlay p,
+        .changeLog p,
+        #settings p {
+          font-size: clamp(14px, 4vw, 20px) !important;
+        }
+
+        .howPlay > p:first-child,
+        .changeLog > p:first-child,
+        #settings > p:first-child {
+          font-size: clamp(26px, 8vw, 42px) !important;
+        }
+
+        .hangerBar a {
+          padding: 10px 12px;
+          font-size: clamp(13px, 3.5vw, 17px);
+        }
+
+        .spaceshipName {
+          position: static;
+          width: 100%;
+          height: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          font-size: clamp(18px, 6vw, 30px);
+        }
+
+        .spaceshipPreview {
+          position: static;
+          width: 100%;
+          height: 100%;
+          display: grid;
+          place-items: center;
+        }
+
+        .spaceshipStats {
+          position: static;
+          width: 100%;
+          height: 200px;
+          min-height: 0;
+          overflow-y: auto;
+        }
+
+        .shipInfoContainer {
+          top: 62px;
+          left: 12px;
+          right: 12px;
+          --card-bottom-gap: 8px;
+          bottom: calc(var(--selector-height) + var(--card-bottom-gap));
+          grid-template-columns: 1fr;
+          grid-template-rows: 42px minmax(90px, 1fr) 200px;
+          grid-template-areas:
+            "name"
+            "preview"
+            "stats";
+          gap: 8px;
+          align-content: normal;
+        }
+
+        .spaceshipSelector {
+          min-height: 0;
+        }
+
+        .spaceshipSelector a {
+          padding: 6px 10px;
+        }
+
+        .spaceshipSelector img {
+          width: clamp(72px, 24vw, 130px);
+        }
+      }
+
+      @media (orientation: landscape) and (max-height: 600px) {
+        #startScreen {
+          justify-content: flex-start;
+          gap: 4px;
+          padding: 8px 12px;
+        }
+
+        #startScreen .title {
+          font-size: clamp(26px, 7vh, 48px);
+        }
+
+        #startScreen .splashText {
+          font-size: clamp(11px, 2.5vh, 16px);
+        }
+
+        #startScreen .button {
+          width: min(680px, 100%);
+          padding: 6px 16px;
+          font-size: clamp(16px, 3.5vh, 24px);
+        }
+
+        .hanger {
+          --selector-height: 96px;
+          --card-bottom-gap: 6px;
+        }
+
+        .hangerBar a {
+          padding: 8px 12px;
+          font-size: 14px;
+        }
+
+        .shipInfoContainer {
+          top: 52px;
+          left: 16px;
+          right: 16px;
+          grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+          gap: 8px;
+        }
+
+        .spaceshipName {
+          font-size: clamp(16px, 4vh, 24px);
+        }
+
+        .spaceshipPreview .shipPrev {
+          max-width: calc(100% - 40px);
+          max-height: calc(100% - 24px);
+        }
+
+        .spaceshipSelector img {
+          width: clamp(80px, 14vh, 130px);
+        }
+      }
+
   </style>
 
   <div id=startScreen>
     <style>
-      #startScreen { position: relative; z-index: 5; }
+      #startScreen {
+        position: fixed;
+        inset: 0;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(8px, 1.2vh, 18px);
+        padding: 20px 16px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+
+      #startScreen .title,
+      #startScreen .splashText {
+        position: static;
+        left: auto;
+        top: auto;
+        margin: 0;
+        white-space: normal;
+        text-align: center;
+      }
+
+      #startScreen .title {
+        font-size: clamp(36px, 6vw, 80px);
+        line-height: 1.1;
+      }
+
+      #startScreen .splashText {
+        font-size: clamp(14px, 2vw, 22px);
+      }
+
+      #startScreen .button {
+        position: static;
+        width: min(960px, 100%);
+        box-sizing: border-box;
+        margin: 0;
+        padding: clamp(10px, 1.2vw, 16px) 20px;
+        font-size: clamp(18px, 3vw, 40px);
+        line-height: 1.2;
+      }
     </style>
 
     <p class="title">PIXEL PILOT</p>
     <p class="splashText" id="splashText"></p>
-    <p class="updateTitle">HANGAR AND MUSIC UPDATE</p>
 
     <button class="button button1" onclick="startGame() || hideDiv('startScreen') || hideDiv('menuBackground')">START GAME</button>
     <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats)">HANGAR</button>
@@ -854,6 +1220,61 @@
     <button class="button button4" onclick="hideDiv('startScreen') || showDiv('credits') || showDiv('panelBackdrop')">CREDITS</button>
     <button class="button button5" onclick="hideDiv('startScreen') || showDiv('settings') || showDiv('panelBackdrop')">SETTINGS</button>
   </div>
+
+  <style>
+    @media (orientation: landscape) and (max-height: 600px) {
+      #startScreen {
+        justify-content: center;
+        gap: 4px;
+        padding: 16px 12px 10px;
+        overflow-y: auto;
+      }
+
+      #startScreen .title {
+        font-size: clamp(26px, 7vh, 48px);
+      }
+
+      #startScreen .splashText {
+        font-size: clamp(11px, 2.5vh, 16px);
+      }
+
+      #startScreen .button {
+        padding: 6px 16px;
+        font-size: clamp(16px, 3.5vh, 24px);
+      }
+
+      .spaceshipPreview .shipPrev {
+        max-width: 55%;
+        max-height: 65%;
+      }
+
+      .gameEnd,
+      .pauseScreen {
+        width: min(620px, calc(100vw - 24px));
+        max-height: calc(100vh - 16px);
+        padding: 10px 16px;
+      }
+
+      .gameEnd .grade-badge {
+        font-size: 42px !important;
+        padding: 2px 14px;
+        margin: 4px 0 2px;
+      }
+
+      .gameEnd .tier-label {
+        font-size: 15px !important;
+        margin-bottom: 6px;
+      }
+
+      .gameEnd .restartGameButton,
+      .gameEnd .goHomeButton,
+      .pauseScreen .restartGameButton,
+      .pauseScreen .goHomeButton {
+        padding: 8px 14px;
+        font-size: 16px;
+      }
+    }
+  </style>
 
   <script>
 
@@ -1025,8 +1446,8 @@ document.getElementById("splashText").textContent =
 let sensitivity = 2;
 
 // Settings state
-let settingsMusicVol   = 0.8;
-let settingsSfxVol     = 1.0;
+let settingsMusicVol   = 0.25;
+let settingsSfxVol     = 0.25;
 let settingsShowHitbox = false;
 
 // For spaceship previews
@@ -1126,7 +1547,6 @@ function drawExplosions() {
   const ctx = myGameArea.context;
   ctx.save();
   ctx.globalAlpha = crashFlash.alpha;
-  // Fade from white to red as alpha drops
   const r = 255;
   const g = Math.round(255 * (crashFlash.alpha));
   const b = Math.round(255 * (crashFlash.alpha));
@@ -1504,7 +1924,7 @@ function hideDiv(divID) {
 
 function showDiv(divID) {
   var x = document.getElementById(divID);
-  x.style.display = "block";
+  x.style.display = divID === 'startScreen' ? "flex" : "block";
 }
 
 function closePanels() {
@@ -1675,8 +2095,8 @@ const DEFAULT_SAVE = {
   },
 
   settings: {
-    musicVolume: 1,
-    sfxVolume: 1,
+    musicVolume: 0.25,
+    sfxVolume: 0.25,
     showHitboxes: false,
   },
 };
@@ -1706,6 +2126,13 @@ function loadSave() {
 
 let saveData = loadSave();
 
+settingsMusicVol = Number.isFinite(Number(saveData.settings.musicVolume))
+  ? Math.min(1, Math.max(0, Number(saveData.settings.musicVolume)))
+  : settingsMusicVol;
+settingsSfxVol = Number.isFinite(Number(saveData.settings.sfxVolume))
+  ? Math.min(1, Math.max(0, Number(saveData.settings.sfxVolume)))
+  : settingsSfxVol;
+
 function saveGame() {
   try {
     localStorage.setItem(
@@ -1715,6 +2142,18 @@ function saveGame() {
   } catch (err) {
     console.error('Failed to save game', err);
   }
+}
+
+function setMusicVolume(value) {
+  settingsMusicVol = parseFloat(value);
+  saveData.settings.musicVolume = settingsMusicVol;
+  saveGame();
+}
+
+function setSfxVolume(value) {
+  settingsSfxVol = parseFloat(value);
+  saveData.settings.sfxVolume = settingsSfxVol;
+  saveGame();
 }
 
 /* ---------------- SCORE ---------------- */
@@ -1843,6 +2282,12 @@ function queryShipCookie() {
 //--------------------------- GAME MECHANICS UNDERNEATH ----------------------------------//
 
 function startGame() {
+  if (isPortraitMobile()) {
+    pendingGameStart = true;
+    document.getElementById('portraitGameBlocker').style.display = 'flex';
+    return false;
+  }
+
   myGamePiece = new component(
     Number(getSelectedShipCookie().at(8)),
     Number(getSelectedShipCookie().at(9)),
@@ -1991,7 +2436,7 @@ var myGameArea = {
   },
 
   resize: function() {
-    // Use cover scaling so the canvas fills the viewport with no side whitespace
+
     const scale = Math.max(
       window.innerWidth / GAME_WIDTH,
       window.innerHeight / GAME_HEIGHT
@@ -2001,18 +2446,18 @@ var myGameArea = {
     const cssH = GAME_HEIGHT * scale;
     const dpr = window.devicePixelRatio || 1;
 
-    // Internal pixel buffer matches the scaled logical size in device pixels
+
     this.canvas.width = Math.round(GAME_WIDTH * scale * dpr);
     this.canvas.height = Math.round(GAME_HEIGHT * scale * dpr);
 
-    // CSS size controls on-screen size; center the canvas so it crops evenly
+
     this.canvas.style.width = cssW + "px";
     this.canvas.style.height = cssH + "px";
     this.canvas.style.position = "absolute";
     this.canvas.style.left = ((window.innerWidth - cssW) / 2) + "px";
     this.canvas.style.top =  ((window.innerHeight - cssH) / 2) + "px";
 
-    // Apply transform so drawing uses logical game coordinates (0..GAME_WIDTH)
+
     this.scaleX = scale;
     this.scaleY = scale;
     this.context.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
@@ -2302,7 +2747,7 @@ function goHome() {
 
 function updateGameArea(delta = 1) {
 
-  // ── CRASH SHAKE MODE: skip gameplay, just redraw with shake ──
+  // ── CRASH SHAKE MODE ──
   if (myGamePiece && myGamePiece.crashed) {
     
     let slowDelta = delta;
@@ -2358,7 +2803,7 @@ function updateGameArea(delta = 1) {
     }
   }
 
-  // Calculate shake offset (won't fire during normal play since crashed=false)
+  // shake offset
   let shakeX = 0, shakeY = 0;
   if (screenShake.active) {
     shakeX = (Math.random() - 0.5) * screenShake.intensity * 2;
@@ -2739,6 +3184,7 @@ document.addEventListener("visibilitychange", function() {
 });
 
 let gamePaused = false;
+let orientationPausedGame = false;
 
 function pauseGame() {
   if (!myGameArea.rafId) return;
@@ -2773,9 +3219,14 @@ var touchDY = 0; // -1 = up, 0 = neutral, 1 = down (normalized)
 var joystickActive = false;
 var joystickStartY = 0;
 var joystickCenterY = 0;
+var pendingGameStart = false;
 
 function isTouchDevice() {
   return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+}
+
+function isPortraitMobile() {
+  return isTouchDevice() && window.matchMedia('(orientation: portrait)').matches;
 }
 
 function showTouchControls() {
@@ -2789,7 +3240,7 @@ function hideTouchControls() {
   document.getElementById('touchFireBtn').style.display = 'none';
 }
 
-(function setupJoystick() {
+document.addEventListener('DOMContentLoaded', function setupJoystick() {
   const outer = document.getElementById('joystickOuter');
   const knob = document.getElementById('joystickKnob');
 
@@ -2829,9 +3280,9 @@ function hideTouchControls() {
   outer.addEventListener('touchmove',  onMove,  { passive: false });
   outer.addEventListener('touchend',   onEnd,   { passive: false });
   outer.addEventListener('touchcancel',onEnd,   { passive: false });
-})();
+});
 
-(function setupFireBtn() {
+document.addEventListener('DOMContentLoaded', function setupFireBtn() {
   const btn = document.getElementById('touchFireBtn');
 
   if (!btn) {
@@ -2847,7 +3298,7 @@ function hideTouchControls() {
     },
     { passive: false }
   );
-})();
+});
 
 //------------------------SETTINGS----------------------------//
 
@@ -2860,14 +3311,14 @@ function buildSettingsPanel() {
       <div class="settings-row">
         <label>Music Volume</label>
         <input type="range" min="0" max="1" step="0.05" value="${settingsMusicVol}"
-          oninput="settingsMusicVol=parseFloat(this.value); document.getElementById('mvLabel').textContent=Math.round(this.value*100)+'%'; if(musicMaster) musicMaster.gain.value=settingsMusicVol; menuMusic.sound.volume=settingsMusicVol;">
+          oninput="setMusicVolume(this.value); document.getElementById('mvLabel').textContent=Math.round(this.value*100)+'%'; if(musicMaster) musicMaster.gain.value=settingsMusicVol; menuMusic.sound.volume=settingsMusicVol;">
         <span id="mvLabel">${Math.round(settingsMusicVol * 100)}%</span>
       </div>
 
       <div class="settings-row">
         <label>SFX Volume</label>
         <input type="range" min="0" max="1" step="0.05" value="${settingsSfxVol}"
-          oninput="settingsSfxVol=parseFloat(this.value); document.getElementById('sfxLabel').textContent=Math.round(this.value*100)+'%';">
+          oninput="setSfxVolume(this.value); document.getElementById('sfxLabel').textContent=Math.round(this.value*100)+'%';">
         <span id="sfxLabel">${Math.round(settingsSfxVol * 100)}%</span>
       </div>
 
@@ -2940,21 +3391,25 @@ function buildSettingsPanel() {
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Changed source files to Github.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Crisper background image.</p>
     <br>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update III (In Progress)</b></p>
+    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update III: We're Back from Summer Break! (In Progress)</b></p>
+    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Big Deal Stuff Here:</b></p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Completely revamped UI style. The other one sucked, I know.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Mobile support added! Mobile controls are now available. The screen is optimized for mobile devices. It's a bit wonky right now, but it's functional.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Pixel-perfect hitboxes. Okay, I know you're excited about this one. The other system wasn't that bad -- sheesh!</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added explosions and explosion sounds. Big booms. Large explosions. Very good.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added spaceship tilting. Woah! That changes things.</p>
+    
     <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Gameplay Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Pixel-perfect hitboxes (Classic ship).</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved gap spawning logic.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Added explosions and explosion sounds.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Added hover SFX on menu buttons.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added touch/mobile controls (virtual joystick + fire button).</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Added personal best / high score tracker.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Score counter flashes at milestones.</p>\
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added spaceship tilting.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Score counter flashes at milestones.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved crash feedback.</p>
+
     <p style="font-size: 25px; font-family: '8bit-font-text'"><b>UI Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Completely revamped UI style.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Ship stats now shown as visual bars.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Animated ship preview in hangar.</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">-Animated ship preview in hangar.</p>=
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Lock badge shown on ships that can't be purchased.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Settings panel now has volume sliders and hitbox toggle.</p>
     <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Bug Fixes</b></p>
@@ -2971,7 +3426,6 @@ function buildSettingsPanel() {
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Somewhat cleaned up code.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Score and Ammo HUD now scale with webpage and are no longer drawn on the canvas.</p>
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Canvas should now scale dynamically to different screen ratios, sizes, and browser zooms.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Migrated to different subdomain.</p>   
     <p style="font-size: 20px; font-family: '8bit-font-text'">-Organized game assests.</p>   
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('changelog') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
@@ -3025,6 +3479,7 @@ function buildSettingsPanel() {
     </div>
   </div>
   <div id="touchFireBtn">FIRE</div>
+  <div id="portraitGameBlocker">Rotate your phone horizontally<br>to play Pixel Pilot.</div>
 
   <div class="hanger" id="hanger" style="background-image: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0)); z-index: 100;">
 
@@ -3033,8 +3488,11 @@ function buildSettingsPanel() {
 
     <div class="hangerBar" id="hangerBar"></div>
 
-    <div class="spaceshipStats" id="spaceshipStats">You shouldn't be seeing this 💀</div>
-    <div class="spaceshipName" id="spaceshipName"></div>
+    <div class="shipInfoContainer">
+      <div class="spaceshipStats" id="spaceshipStats"></div>
+      <div class="spaceshipName" id="spaceshipName"></div>
+      <div class="spaceshipPreview" id="spaceshipPreview"></div>
+    </div>
 
     <div class="spaceshipSelector" id="spaceshipSelector">
       <a onclick="setCard('CLASSIC', classicstats) || setPicture(classicSpaceshipPrev)">
@@ -3045,14 +3503,52 @@ function buildSettingsPanel() {
       </a>
     </div>
 
-    <div class="spaceshipPreview" id="spaceshipPreview">Hello</div>
+  
   </div>
 
   <script>
-    // Wire up the settings button to build the panel before showing it
+    // build pane before showing it
     document.querySelector('.button5').addEventListener('click', function() {
       buildSettingsPanel();
     });
+
+    function updatePortraitGameBlocker() {
+      const blocker = document.getElementById('portraitGameBlocker');
+      if (!blocker) return;
+
+      if (isPortraitMobile()) {
+        if (myGameArea.rafId !== null) {
+          myGameArea.stop();
+          gamePaused = true;
+          orientationPausedGame = true;
+          hideTouchControls();
+        }
+        blocker.style.display = 'flex';
+        return;
+      }
+
+      if (blocker.style.display === 'flex') {
+        blocker.style.display = 'none';
+        if (pendingGameStart) {
+          pendingGameStart = false;
+          hideDiv('startScreen');
+          hideDiv('menuBackground');
+          startGame();
+          return;
+        }
+        if (orientationPausedGame) {
+          orientationPausedGame = false;
+          showTouchControls();
+          resumeGame();
+          return;
+        }
+
+        hideTouchControls();
+      }
+    }
+
+    window.addEventListener('resize', updatePortraitGameBlocker);
+    window.addEventListener('orientationchange', updatePortraitGameBlocker);
   </script>
 
 </body>
