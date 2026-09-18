@@ -9,7 +9,7 @@
 </head>
 
 <body
-  onload="queryShipCookie() || setScorebar() || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats)">
+  onload="queryShipCookie(); setScorebar(); setPicture(classicSpaceshipPrev); setCard('CLASSIC', classicstats)">
   <style>
 
     @font-face {
@@ -1214,7 +1214,7 @@
     <p class="splashText" id="splashText"></p>
 
     <button class="button button1" onclick="startGame() || hideDiv('startScreen') || hideDiv('menuBackground')">START GAME</button>
-    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats)">HANGAR</button>
+    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || setScorebar() || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats)">HANGAR</button>
     <button class="button button2" onclick="hideDiv('startScreen') || showDiv('howPlay') || showDiv('panelBackdrop')">HOW TO PLAY</button>
     <button class="button button3" onclick="hideDiv('startScreen') || showDiv('changelog') || showDiv('panelBackdrop')">CHANGELOG</button>
     <button class="button button4" onclick="hideDiv('startScreen') || showDiv('credits') || showDiv('panelBackdrop')">CREDITS</button>
