@@ -652,7 +652,7 @@ function setCard(ssName, ssStats) {
 
   if (ssName == 'Pixel Piece Prospecter') {
     if (array[0] !== 'yes') {
-      // Not purchased. show purchase button or lock badge
+      // Not purchased — show purchase button or lock badge
       if (pp >= 20000) {
         y.innerHTML += pixproPurchaseButton;
       } else {
@@ -1013,23 +1013,6 @@ function queryShipCookie() {
     saveGame();
   }
 }
-
-function initializePage() {
-  queryShipCookie();
-  setScorebar();
-  setPicture(classicSpaceshipPrev);
-  setCard('CLASSIC', classicstats);
-}
-
-function openHangar() {
-  hideDiv('startScreen');
-  showDiv('hanger');
-  setScorebar();
-  setPicture(classicSpaceshipPrev);
-  setCard('CLASSIC', classicstats);
-}
-
-document.addEventListener('DOMContentLoaded', initializePage);
 
 //--------------------------- GAME MECHANICS UNDERNEATH ----------------------------------//
 
