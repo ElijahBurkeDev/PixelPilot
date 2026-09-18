@@ -625,19 +625,6 @@ function updateDynamicMusic(score) {
 
 //--------------------------- END DYNAMIC MUSIC ENGINE -----------------------//
 
-
-function queryShipCookie() {
-  let array = getPurchasedShipsCookie();
-
-  if (!array) {
-    try {
-      setPurchasedShipsCookie('no', 'no', 'no');
-    } catch (e) {
-      console.warn('Cookie storage unavailable');
-    }
-  }
-}
-
 function hideDiv(divID) {
   var x = document.getElementById(divID);
   x.style.display = "none";
@@ -665,7 +652,7 @@ function setCard(ssName, ssStats) {
 
   if (ssName == 'Pixel Piece Prospecter') {
     if (array[0] !== 'yes') {
-      // Not purchased — show purchase button or lock badge
+      // Not purchased. show purchase button or lock badge
       if (pp >= 20000) {
         y.innerHTML += pixproPurchaseButton;
       } else {
@@ -828,17 +815,38 @@ function loadSave() {
     const raw = localStorage.getItem(SAVE_KEY);
 
     if (!raw) {
-      localStorage.setItem(
-        SAVE_KEY,
-        JSON.stringify(DEFAULT_SAVE)
-      );
-
-      return structuredClone(DEFAULT_SAVE);
+      const defaultSave = structuredClone(DEFAULT_SAVE);
+      localStorage.setItem(SAVE_KEY, JSON.stringify(defaultSave));
+      return defaultSave;
     }
 
+    const storedSave = JSON.parse(raw);
+    if (!storedSave || typeof storedSave !== 'object') {
+      throw new Error('Saved data is not an object');
+    }
+
+    const defaultSave = structuredClone(DEFAULT_SAVE);
     return {
-      ...structuredClone(DEFAULT_SAVE),
-      ...JSON.parse(raw),
+      ...defaultSave,
+      ...storedSave,
+      selectedShip: {
+        ...defaultSave.selectedShip,
+        ...(storedSave.selectedShip && typeof storedSave.selectedShip === 'object'
+          ? storedSave.selectedShip
+          : {}),
+      },
+      purchasedShips: {
+        ...defaultSave.purchasedShips,
+        ...(storedSave.purchasedShips && typeof storedSave.purchasedShips === 'object'
+          ? storedSave.purchasedShips
+          : {}),
+      },
+      settings: {
+        ...defaultSave.settings,
+        ...(storedSave.settings && typeof storedSave.settings === 'object'
+          ? storedSave.settings
+          : {}),
+      },
     };
   } catch (err) {
     console.error('Failed to load save', err);
@@ -985,18 +993,23 @@ function getSpaceshipsCookie() {
 /* ---------------- INITIALIZATION ---------------- */
 
 function queryShipCookie() {
-  if (!saveData.purchasedShips) {
-    saveData.purchasedShips = {
-      pixpro: false,
-      ship2: false,
-      ship3: false,
+  if (!saveData.selectedShip || !saveData.purchasedShips || !saveData.settings) {
+    saveData = {
+      ...structuredClone(DEFAULT_SAVE),
+      ...saveData,
+      selectedShip: {
+        ...DEFAULT_SAVE.selectedShip,
+        ...(saveData.selectedShip || {}),
+      },
+      purchasedShips: {
+        ...DEFAULT_SAVE.purchasedShips,
+        ...(saveData.purchasedShips || {}),
+      },
+      settings: {
+        ...DEFAULT_SAVE.settings,
+        ...(saveData.settings || {}),
+      },
     };
-
-    if (getSelectedShipCookie() = null) {
-        console.log("Selected cookie set since none was found.")
-        setSelectedShipCookie(7, 1, '1ast', 1, 'single-shot', 50, 50, 1, 110, 90, './images/classic_spaceship_guns_removed_thrust.png', 'c')
-    }
-
     saveGame();
   }
 }
