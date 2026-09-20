@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Pixel Pilot</title>
+  <link rel="icon" type="image/x-icon" href="./images/ppfavicon.ico">
+</head>
+
+<body>
+<script>
+
+
+fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/dev/index.html')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.text();
+  })
+  .then(html => {
+    document.body.innerHTML = html;
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/ElijahBurkeDev/PixelPilot@dev/script.js';
+    script.onload = () => {
+      console.log('Remote script loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Failed to load remote script, trying local fallback...');
+      loadLocalFallback();
+    };
+    document.body.appendChild(script);
+  })
+  .catch(error => {
+    console.warn('Remote fetch failed, reverting to local files:', error);
+    loadLocalFallback();
+  });
+
+function loadLocalFallback() {
+
+  const confirmReload = confirm(
+    "Fallback Mode Activated\n\n" +
+    "The remote server could not be reached. You are now loading a fallback version.\n\n" +
+    "WARNING: This version might be outdated compared to the official release.\n\n" +
+    "Click 'Cancel' if you want to wait and try again, or 'OK' to continue."
+  );
+
+  if (!confirmReload) {
+    console.log("User cancelled fallback load.");
+    return; // stop execution
+  }
+
+
+  fetch('main.html')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Local main.html not found');
+      }
+      return response.text();
+    })
+    .then(html => {
+      document.body.innerHTML = html;
+      
+      const script = document.createElement('script');
+      script.src = 'script.js';
+      script.onload = () => {
+        console.log('Local fallback loaded successfully');
+      };
+      script.onerror = () => {
+        console.error('Local script also failed!');
+      };
+      document.body.appendChild(script);
+    })
+    .catch(err => {
+      console.error('Fallback failed completely:', err);
+      document.body.innerHTML = '<h1>Service Unavailable</h1><p>Please check your connection or try again later.</p>';
+    });
+}
+
+</script>
+</body>
+</html>
