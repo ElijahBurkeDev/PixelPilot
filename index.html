@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -12,7 +12,7 @@
 <script>
 
 
-fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/dev/game.html')
+fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/dev/game.html', { cache: 'no-store' })
   .then(response => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -23,9 +23,10 @@ fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/de
     document.body.innerHTML = html;
 
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/gh/ElijahBurkeDev/PixelPilot@dev/script.js';
+    script.src = `./script.js?v=${Date.now()}`;
     script.onload = () => {
       console.log('Remote script loaded successfully');
+      queryShipCookie() || showShip('classic');
     };
     script.onerror = () => {
       console.error('Failed to load remote script, trying local fallback...');
@@ -53,10 +54,10 @@ function loadLocalFallback() {
   }
 
 
-  fetch('main.html')
+  fetch('game.html', { cache: 'no-store' })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Local main.html not found');
+        throw new Error('Local game.html not found');
       }
       return response.text();
     })
@@ -64,9 +65,10 @@ function loadLocalFallback() {
       document.body.innerHTML = html;
       
       const script = document.createElement('script');
-      script.src = 'script.js';
+      script.src = `./script.js?v=${Date.now()}`;
       script.onload = () => {
         console.log('Local fallback loaded successfully');
+        queryShipCookie() || showShip('classic');
       };
       script.onerror = () => {
         console.error('Local script also failed!');
