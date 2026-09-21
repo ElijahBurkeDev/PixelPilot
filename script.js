@@ -7,54 +7,121 @@ window.Userback = window.Userback || {};
   })(document);
 
 
-    // For spaceship cards
-var classicstats = `<span style="font-size: 16px; font-family: '8bit-font-text'; color: #c8c8d0;"> 
-     PRICE: Free 
-</span>` + buildStatBars(7, 1, 1) + `<span style="font-size: 14px; font-family: '8bit-font-text'; color: #c8c8d0;">
-<br> Guns: 1x AstroPopper
-<br> Cooldown: 1 second
-<br> Fire modes: Single-shot
- <br> Score Multiplier: 1
- <br> Size: Medium
- <br><br> Write-up: This spaceship is... well... classic. Large and fast with no multiplier, it's not quite the best spaceship. But hey, it's free.</span> 
- <br><br>`
+const SPACESHIPS = {
+  classic: {
+    name: 'CLASSIC',
+    image: './images/classic_spaceship_guns_removed_thrust.png',
+    gunPosX: 50,
+    gunPosY: 50,
+    width: 110,
+    height: 90,
+    guns: 'astropopper',
+    numberOfGuns: 1,
+    price: 0,
+    purchasedKey: null,
+    stats: {
+      speed: 7,
+      maneuverability: 1,
+      multiplier: 1,
+      hullSize: 5,
+      writeUp: "This spaceship is classic. Some veteran pilots will remember it from the early days of Pixel Pilot. Large and hard to control with no multiplier, it's not quite the best spaceship. But hey, it's free.",
+    },
+    controls: {
+      sensitivity: 1,
+    },
+  },
+  pixpro: {
+    name: 'Pixel Piece Prospecter',
+    image: './images/prospector_spaceship_guns_removed_thrust.png',
+    gunPosX: 50,
+    gunPosY: 50,
+    width: 110,
+    height: 90,
+    guns: 'astropopper',
+    numberOfGuns: 1,
+    price: 20000,
+    purchasedKey: 'pixpro',
+    stats: {
+      speed: 7,
+      maneuverability: 1,
+      multiplier: 1.25,
+      hullSize: 5,
+      writeUp: 'The Pixel Piece Prospector is just here for the money (and alliteration). It\'s just a reskin of the Classic, you say? Nah, that\'s <i>way</i> too lazy. It has nothing to boast of in performance, but its score multiplier will help you earn some extra Pixel Pieces!',
+    },
+    controls: {
+      sensitivity: 1,
+    },
+  },
+};
 
- var classicEquipButton = `<button class="button buttonPurchase" onclick="setSelectedShipCookie(7, 1, '1ast', 1, 'single-shot', 50, 50, 1, 110, 90, './images/classic_spaceship_guns_removed_thrust.png', 'c') || shipEquiped(this)">Equip Ship</button>`
+const GUNS = {
+    astropopper: {
+      name: 'AstroPopper',
+      code: '1ast',
+      cooldown: 1,
+      fireModes: 'Single-shot',
+      bulletcapacity: 8,
+      writeUp: 'The AstroPopper is a basic gun that fires a single shot at a time.',
+    }
+}
 
-//----------------------------------------------------------------
+function getShipStatsMarkup(ship) {
+  const stats = ship.stats;
+  const gun = GUNS[ship.guns];
+  const price = ship.price === 0 ? 'Free' : `${ship.price}PP`;
+  const gunLabel = `${ship.numberOfGuns}x ${gun.name}`;
+  const gunTooltip = `<span class="gun-tooltip" role="tooltip">
+    <strong>${gun.name}</strong>
+    <span><b>Cooldown:</b> ${gun.cooldown} second${gun.cooldown === 1 ? '' : 's'}</span>
+    <span><b>Bullet capacity:</b> ${gun.bulletcapacity}</span>
+    <span><b>Fire mode:</b> ${gun.fireModes}</span>
+    <span>${gun.writeUp}</span>
+  </span>`;
+  return `<span style="font-size: 16px; font-family: '8bit-font-text'; color: #c8c8d0;">PRICE: ${price}</span>`
+    + buildStatBars(stats.speed, stats.maneuverability, stats.multiplier, stats.hullSize)
+    + `<span style="font-size: 14px; font-family: '8bit-font-text'; color: #c8c8d0;">\n<br> WEAPON // <span class="gun-tooltip-trigger" tabindex="0">${gunLabel}${gunTooltip}</span>\n<br><br>${stats.writeUp}</span><br>`;
+}
 
-var pixproStats = `<span style="font-size: 16px; font-family: '8bit-font-text'; color: #c8c8d0;"> 
-    PRICE: 20000PP 
-</span>` + buildStatBars(7, 1, 1.25) + `<span style="font-size: 14px; font-family: '8bit-font-text'; color: #c8c8d0;">
-<br> Guns: 1x AstroPopper
-<br> Cooldown: 1 second
-<br> Fire modes: Single-shot
-<br> Score Multiplier: 1.25
-<br> Size: Medium
-<br><br> Write-up: The Pixel Piece Prospector is just here for the money (and alliteration). It has nothing to boast of in performance, but its score multiplier will get you cash—fast!
-<br>
-</span>`  
+function getShipPreview(ship) { return `<img class="shipPrev" src="${ship.image}">`; }
 
-var pixproPurchaseButton = `<button id="pixproPurchaseButton" class="button buttonPurchase" onclick="purchaseAttempt(20000, 'pixpro')">Purchase Ship</button> <br>`
-var pixproEquipButton = `<br> <br> <button class="button buttonPurchase" onclick="setSelectedShipCookie(7, 1, '1ast', 1, 'single-shot', 50, 50, 1.25, 110, 90, './images/prospector_spaceship_guns_removed_thrust.png', 'gs') || shipEquiped(this)">Equip Ship</button>`
+function equipShip(shipKey, button) {
+  const ship = SPACESHIPS[shipKey];
+  const stats = ship.stats;
+  const gun = GUNS[ship.guns];
+  const controls = ship.controls;
+  setSelectedShipCookie(stats.speed, controls.sensitivity, gun.code, gun.cooldown, gun.fireModes.toLowerCase(), ship.gunPosX, ship.gunPosY, stats.multiplier, ship.width, ship.height, ship.image, ship.name);
+  shipEquiped(button);
+}
+
+function getEquipButton(shipKey) { return `<br><br><button class="button buttonPurchase" onclick="equipShip('${shipKey}', this)">Equip Ship</button>`; }
+
+function getPurchaseButton(ship) { return `<button id="${ship.purchasedKey}PurchaseButton" class="button buttonPurchase" onclick="purchaseAttempt(${ship.price}, '${ship.purchasedKey}')">Purchase Ship</button><br>`; }
+
+function showShip(shipKey) {
+  const ship = SPACESHIPS[shipKey];
+  setPicture(getShipPreview(ship));
+  setCard(shipKey);
+}
 
 
 //----------------------------------------------------------------------
-// ── STAT BARS BUILDER ──
-function buildStatBars(speed, maneuver, multiplier) {
+// STAT BARS BUILDER 
+function buildStatBars(speed, maneuver, multiplier, hullSize) {
   function bar(label, value, max, color) {
     const pct = Math.min(100, Math.round((value / max) * 100));
     return `<div class="stat-bar-wrap">
       <span class="stat-bar-label">${label}</span>
-      <div class="stat-bar-track">
+      <div class="stat-bar-track" tabindex="0" aria-label="${label.replace(/<[^>]*>/g, '')}: ${value}">
         <div class="stat-bar-fill" style="width:${pct}%; background:${color};"></div>
       </div>
+      <span class="stat-bar-value" role="tooltip">${value}</span>
     </div>`;
   }
-  return `<div style="margin: 10px 0 4px 0;">
-    ${bar('Speed', speed, 10, '#e03a3a')}
-    ${bar('Maneuverability', maneuver, 5, '#4a9bdc')}
-    ${bar('Multiplier', multiplier, 2, '#e8c84a')}
+  return `<div style="margin: 12px 0 4px 0;">
+    ${bar('<b>Speed</b>', speed, 50, '#e03a3a')}
+    ${bar('<b>Maneuverability</b>', maneuver, 10, '#4a9bdc')}
+    ${bar('<b>Multiplier</b>', multiplier, 10, '#e8c84a')}
+    ${bar('<b>Hull Size</b>', hullSize, 10, '#9b6ad6')}
   </div>`;
 }
 
@@ -171,10 +238,6 @@ let sensitivity = 2;
 let settingsMusicVol   = 0.25;
 let settingsSfxVol     = 0.25;
 let settingsShowHitbox = false;
-
-// For spaceship previews
-var classicSpaceshipPrev = `<img class="shipPrev" src="./images/classic_spaceship_guns_removed_thrust.png">`
-var pieproSpaceshipsPrev = `<img class="shipPrev" src="./images/prospector_spaceship_guns_removed_thrust.png">`
 
 // For game canvas
 var myGamePiece;
@@ -643,50 +706,30 @@ function closePanels() {
   showDiv('startScreen');
 }
 
-function setCard(ssName, ssStats) {
+function setCard(shipKey) {
+  const ship = SPACESHIPS[shipKey];
   var x = document.getElementById("spaceshipName");
-  x.innerHTML = ssName;
+  x.innerHTML = ship.name;
   var y = document.getElementById("spaceshipStats");
-  y.innerHTML = ssStats;
-  const array = getPurchasedShipsCookie();
+  y.innerHTML = getShipStatsMarkup(ship);
   const pp = getScoreCookie();
 
-  if (ssName == 'Pixel Piece Prospecter') {
-    if (array[0] !== 'yes') {
+  if (ship.purchasedKey) {
+    if (!saveData.purchasedShips[ship.purchasedKey]) {
       // Not purchased — show purchase button or lock badge
-      if (pp >= 20000) {
-        y.innerHTML += pixproPurchaseButton;
+      if (pp >= ship.price) {
+        y.innerHTML += getPurchaseButton(ship);
       } else {
-        y.innerHTML += `<div class="shipLockBadge">Need ${(20000 - pp).toLocaleString()} more PP</div>`;
+        y.innerHTML += `<div class="shipLockBadge">Need ${(ship.price - pp).toLocaleString()} more PP</div>`;
       }
-    } else {
-      console.log('Pixel Piece Prospecter is purchased');
     }
   }
 
-
-  if (getSelectedShipCookie().at(11) !== 'gs' && ssName == 'Pixel Piece Prospecter') {
-    addPixProEquip();
-  }
-  if (getSelectedShipCookie().at(11) !== 'c' && ssName == 'CLASSIC') {
-    addClassicEquip();
+  if (getSelectedShipCookie().at(11) !== ship.name && (ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey])) {
+    y.innerHTML += getEquipButton(shipKey);
   }
 
   console.log("setCard function called");
-}
-
-function addPixProEquip() {
-  const array = getPurchasedShipsCookie();
-  if (array[0] == 'yes') {
-    x = document.getElementById('spaceshipStats');
-    x.innerHTML += pixproEquipButton;
-  }
-}
-
-
-function addClassicEquip() {
-  x = document.getElementById('spaceshipStats');
-  x.innerHTML += classicEquipButton;
 }
 
 function shipEquiped(e) {
@@ -729,7 +772,15 @@ function updateHUDs(currentScore) {
     const ammoEl  = document.getElementById('ammoHUD');
     const s = typeof currentScore === 'number' ? Math.round(currentScore) : Math.round(myGameArea.frameNo / 4 * getSelectedShipCookie().at(7));
     if (scoreEl) scoreEl.textContent = 'SCORE: ' + s;
-    if (ammoEl)  ammoEl.textContent = 'Ammo: ' + (myGamePiece && myGamePiece.ammo != null ? myGamePiece.ammo : 0) + '/8';
+    if (ammoEl) {
+      ammoEl.style.display = 'flex';
+      const ammo = myGamePiece && myGamePiece.ammo != null ? myGamePiece.ammo : 0;
+      const maxAmmo = 8;
+      ammoEl.setAttribute('aria-label', `Ammo: ${ammo} of ${maxAmmo}`);
+      ammoEl.innerHTML = Array.from({ length: maxAmmo }, (_, index) =>
+        `<span class="ammo-cell${index < ammo ? ' is-loaded' : ''}" aria-hidden="true"></span>`
+      ).join('');
+    }
   } catch (e) { /* ignore */ }
 }
 
@@ -749,9 +800,9 @@ function purchaseAttempt(purchasePrice, shipName) {
 
     if (shipName == 'pixpro') {
       setPurchasedShipsCookie('yes', 'no', 'no');
-      addPixProEquip();
       var x = document.getElementById('pixproPurchaseButton');
       if (x) x.style.display = "none";
+      setCard('pixpro');
     }
 
   } else {
@@ -784,18 +835,18 @@ const DEFAULT_SAVE = {
   score: 0,
 
   selectedShip: {
-    speed: 7,
-    sensitivity: 1,
-    guns: '1ast',
-    cooldown: 1,
-    fireModes: 'single-shot',
-    gunPosX: 50,
-    gunPosY: 50,
-    multiplier: 1,
-    width: 110,
-    height: 90,
-    image: './images/classic_spaceship_guns_removed_thrust.png',
-    id: 'c',
+    speed: SPACESHIPS.classic.stats.speed,
+    sensitivity: SPACESHIPS.classic.controls.sensitivity,
+    guns: GUNS[SPACESHIPS.classic.guns].code,
+    cooldown: GUNS[SPACESHIPS.classic.guns].cooldown,
+    fireModes: GUNS[SPACESHIPS.classic.guns].fireModes.toLowerCase(),
+    gunPosX: SPACESHIPS.classic.gunPosX,
+    gunPosY: SPACESHIPS.classic.gunPosY,
+    multiplier: SPACESHIPS.classic.stats.multiplier,
+    width: SPACESHIPS.classic.width,
+    height: SPACESHIPS.classic.height,
+    image: SPACESHIPS.classic.image,
+    name: SPACESHIPS.classic.name,
   },
 
   purchasedShips: {
@@ -827,14 +878,17 @@ function loadSave() {
     }
 
     const defaultSave = structuredClone(DEFAULT_SAVE);
+    const storedSelectedShip = storedSave.selectedShip && typeof storedSave.selectedShip === 'object'
+      ? storedSave.selectedShip
+      : {};
+
     return {
       ...defaultSave,
       ...storedSave,
       selectedShip: {
         ...defaultSave.selectedShip,
-        ...(storedSave.selectedShip && typeof storedSave.selectedShip === 'object'
-          ? storedSave.selectedShip
-          : {}),
+        ...storedSelectedShip,
+        name: storedSelectedShip.name || defaultSave.selectedShip.name,
       },
       purchasedShips: {
         ...defaultSave.purchasedShips,
@@ -912,7 +966,7 @@ function setSelectedShipCookie(
   width,
   height,
   url,
-  ship
+  name
 ) {
   saveData.selectedShip = {
     speed,
@@ -926,7 +980,7 @@ function setSelectedShipCookie(
     width,
     height,
     image: url,
-    id: ship,
+    name,
   };
 
   saveGame();
@@ -939,11 +993,12 @@ function setSelectedShipCookie(
 
 function getSelectedShipCookie() {
   const s = saveData.selectedShip;
+  const gunCode = typeof s.guns === 'string' ? s.guns : GUNS[SPACESHIPS.classic.guns].code;
 
   return [
     s.speed,
     s.sensitivity,
-    s.guns,
+    gunCode,
     s.cooldown,
     s.fireModes,
     s.gunPosX,
@@ -952,7 +1007,7 @@ function getSelectedShipCookie() {
     s.width,
     s.height,
     s.image,
-    s.id,
+    s.name,
   ];
 }
 
@@ -1371,6 +1426,8 @@ function component(width, height, color, x, y, type, secondaryType, healthpoints
   stopDynamicMusic();
   gameoverSound.play();
   hideTouchControls();
+  const ammoEl = document.getElementById('ammoHUD');
+  if (ammoEl) ammoEl.style.display = 'none';
   const hsEl = document.getElementById('highScoreHUD');
   if (hsEl) hsEl.style.display = 'none';
 
@@ -1457,7 +1514,11 @@ function goHome() {
   myBackground = null;
   // Clear DOM HUDs
   const _sEl = document.getElementById('scoreHUD'); if (_sEl) _sEl.textContent = '';
-  const _aEl = document.getElementById('ammoHUD');  if (_aEl) _aEl.textContent = '';
+  const _aEl = document.getElementById('ammoHUD');
+  if (_aEl) {
+    _aEl.textContent = '';
+    _aEl.style.display = 'none';
+  }
   screenShake.active = false;
   screenShake.intensity = 0;
   speedLines = [];
@@ -1755,7 +1816,9 @@ function fireBullet() {
     const bulletSpeedX = 15 * Math.cos(tilt);
     const bulletSpeedY = 15 * Math.sin(tilt);
 
-    if (getSelectedShipCookie().at(2).includes('1')) {
+    const gunCode = getSelectedShipCookie().at(2);
+
+    if (gunCode.includes('1')) {
       const b = new component(30, 7, "yellow", myGamePiece.x + 110, (myGamePiece.y + Number(myGamePiece.gunPosY)), "bullets", "n/a", "n/a");
       b.baseBulletSpeedX = bulletSpeedX;
       b.baseBulletSpeedY = bulletSpeedY;
@@ -1764,7 +1827,7 @@ function fireBullet() {
       updateHUDs();
     }
 
-    if (getSelectedShipCookie().at(2).includes('2')) {
+    if (gunCode.includes('2')) {
       const b1 = new component(30, 7, "yellow", myGamePiece.x + 110, (myGamePiece.y + Number(myGamePiece.gunPosY) - 7), "bullets", "n/a", "n/a");
       const b2 = new component(30, 7, "yellow", myGamePiece.x + 110, (myGamePiece.y + Number(myGamePiece.gunPosY) + 55), "bullets", "n/a", "n/a");
       b1.baseBulletSpeedX = bulletSpeedX;
@@ -1911,7 +1974,7 @@ function getShipHitboxes(x, y, w, h, angle) {
 
 //------------------------Pausing----------------------------//
 
-// FIX: only pause on tab-out if the game is actively running (not crashed)
+// only pause on tab-out if the game is actively running (not crashed)
 document.addEventListener("visibilitychange", function() {
   const endScreenVisible = document.getElementById('endScreen').style.display === 'block';
   if (document.hidden && myGameArea.rafId !== null && !endScreenVisible) {
@@ -2027,7 +2090,7 @@ document.addEventListener('DOMContentLoaded', function setupFireBtn() {
   }
 
   btn.addEventListener(
-    'touchstart',
+    'pointerdown',
     function (e) {
       e.preventDefault();
       fireBullet();
@@ -2088,7 +2151,10 @@ function buildSettingsPanel() {
       if (!blocker) return;
 
       if (isPortraitMobile()) {
-        if (myGameArea.rafId !== null) {
+        const gameIsRunning = myGameArea.rafId != null;
+        if (!pendingGameStart && !gameIsRunning) return;
+
+        if (gameIsRunning) {
           myGameArea.stop();
           gamePaused = true;
           orientationPausedGame = true;
@@ -2122,7 +2188,7 @@ function buildSettingsPanel() {
     window.addEventListener('orientationchange', updatePortraitGameBlocker);
 
   (function() {
-    // Check if the current domain matches the dev site
+    // Check if url is the dev site
     if (window.location.hostname === 'pixelpilotdev.w3spaces.com') {
 
       const banner = document.createElement('div');

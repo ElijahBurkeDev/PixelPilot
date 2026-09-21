@@ -9,7 +9,7 @@
 </head>
 
 <body
-  onload="queryShipCookie() || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats) || console.log('onload called')">
+  onload="queryShipCookie() || showShip('classic') || console.log('onload called')">
   <style>
 
     @font-face {
@@ -81,7 +81,7 @@
       text-decoration: none;
       background-color: #1a0808;
       font-size: 20px;
-      font-family: "Lucida Console", "Courier New", monospace;
+      font-family: '8bit-font-text';
       border: 1px solid #8b1a1a;
     }
 
@@ -286,6 +286,7 @@
 
     /* ── STAT BARS ── */
     .stat-bar-wrap {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -306,11 +307,79 @@
       border-radius: 4px;
       height: 14px;
       overflow: hidden;
+      cursor: help;
+      outline: none;
     }
     .stat-bar-fill {
       height: 100%;
       border-radius: 4px;
       transition: width 0.4s ease;
+    }
+
+    .stat-bar-value {
+      display: none;
+      position: absolute;
+      top: 22px;
+      left: 138px;
+      z-index: 10;
+      padding: 4px 8px;
+      background: #0f0f14;
+      border: 1px solid #e8c84a;
+      color: #e8c84a;
+      font-family: '8bit-font-text';
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+    }
+
+    .stat-bar-track:hover + .stat-bar-value,
+    .stat-bar-track:focus + .stat-bar-value {
+      display: block;
+    }
+
+    .gun-tooltip-trigger {
+      position: relative;
+      display: inline-block;
+      color: #e8c84a;
+      text-decoration: underline dotted;
+      cursor: help;
+    }
+
+    .gun-tooltip {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 10px);
+      left: 50%;
+      width: 250px;
+      transform: translateX(-50%);
+      padding: 12px;
+      background: #0f0f14;
+      border: 1px solid #e8c84a;
+      color: #c8c8d0;
+      text-align: left;
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+    }
+
+    .gun-tooltip strong,
+    .gun-tooltip span {
+      display: block;
+    }
+
+    .gun-tooltip strong {
+      margin-bottom: 7px;
+      color: #e8c84a;
+    }
+
+    .gun-tooltip span {
+      margin-top: 4px;
+    }
+
+    .gun-tooltip-trigger:hover .gun-tooltip,
+    .gun-tooltip-trigger:focus .gun-tooltip {
+      display: block;
     }
 
     /* ── PANEL BACKDROP ── */
@@ -370,7 +439,7 @@
       border: 2px solid #8b1a1a;
       border-radius: 16px;
       color: #c8c8d0;
-      font-family: "Lucida Console", "Courier New", monospace;
+      font-family: '8bit-font-text';
       line-height: 1.2;
 
       scrollbar-width: thin;
@@ -380,6 +449,11 @@
     .changeLog::-webkit-scrollbar { width: 6px; }
     .changeLog::-webkit-scrollbar-track { background: #1a0808; border-radius: 4px; }
     .changeLog::-webkit-scrollbar-thumb { background-color: #8b1a1a; border-radius: 4px; }
+
+    .changeLog .changelog-title { font-size: 60px; color: #e8c84a; }
+    .changeLog .changelog-update { font-size: 30px; }
+    .changeLog .changelog-section { font-size: 25px; }
+    .changeLog .changelog-entry { font-size: 20px; }
 
     /* ── GAME OVER SCREEN ── */
     .gameEnd {
@@ -841,16 +915,49 @@
       }
 
       #ammoHUD {
+        display: none;
         position: fixed;
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
-        font-family: '8bit-font-text';
-        font-size: 18px;
-        color: #e03a3a;
+        gap: 5px;
+        padding: 6px 8px;
+        background: rgba(15, 15, 20, 0.78);
+        border: 1px solid #5a1a1a;
+        box-shadow: 0 3px 0 #1a0808;
         z-index: 150;
         pointer-events: none;
-        text-shadow: 1px 1px #1a0a00;
+      }
+
+      .ammo-cell {
+        position: relative;
+        display: block;
+        width: 9px;
+        height: 18px;
+        background: #2a1616;
+        border: 1px solid #6a2a2a;
+        box-sizing: border-box;
+        image-rendering: pixelated;
+      }
+
+      .ammo-cell::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 2px;
+        width: 3px;
+        height: 3px;
+        background: #6a2a2a;
+      }
+
+      .ammo-cell.is-loaded {
+        background: #e03a3a;
+        border-color: #ff6b6b;
+        box-shadow: 0 0 5px rgba(224, 58, 58, 0.55);
+      }
+
+      .ammo-cell.is-loaded::before {
+        background: #e8c84a;
       }
 
       /* Responsive panels and hangar layout */
@@ -1214,7 +1321,7 @@
     <p class="splashText" id="splashText"></p>
 
     <button class="button button1" onclick="startGame() || hideDiv('startScreen') || hideDiv('menuBackground')">START GAME</button>
-    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || setPicture(classicSpaceshipPrev) || setCard('CLASSIC', classicstats) || setScorebar()">HANGAR</button>
+    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || showShip('classic') || setScorebar()">HANGAR</button>
     <button class="button button2" onclick="hideDiv('startScreen') || showDiv('howPlay') || showDiv('panelBackdrop')">HOW TO PLAY</button>
     <button class="button button3" onclick="hideDiv('startScreen') || showDiv('changelog') || showDiv('panelBackdrop')">CHANGELOG</button>
     <button class="button button4" onclick="hideDiv('startScreen') || showDiv('credits') || showDiv('panelBackdrop')">CREDITS</button>
@@ -1296,70 +1403,71 @@
 
   <!-- CHANGELOG -->
   <div class="changeLog" id="changelog">
-    <p style="font-size: 60px; font-family: '8bit-font-text'; color: #e8c84a;">CHANGELOG</p>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>RELEASED: (2/3/2025)</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">Pixel Pilot was released to 8-9 Student Commons.</p>
+    <p class="changelog-title">CHANGELOG</p>
+    <p class="changelog-update"><b>RELEASED: (2/3/2025)</b></p>
+    <p class="changelog-entry">Pixel Pilot was released to 8-9 Student Commons.</p>
     <br>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update I (2/17/2025)</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved hitbox for spaceship.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added difficulty levels.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added GAME OVER screen.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Implemented cookies for persistent score.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved title visibility.</p>
+    <p class="changelog-update"><b>Update I (2/17/2025)</b></p>
+    <p class="changelog-entry">-Improved hitbox for spaceship.</p>
+    <p class="changelog-entry">-Added difficulty levels.</p>
+    <p class="changelog-entry">-Added GAME OVER screen.</p>
+    <p class="changelog-entry">-Implemented cookies for persistent score.</p>
+    <p class="changelog-entry">-Improved title visibility.</p>
     <br>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update II: Hangar and Music Update (4/26/2025)</b></p>
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Gameplay Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved speed ramp-up.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Changed obstacle frequency.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added hangar with purchasable ships.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added in-game music.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Greatly fixed spaceship hitboxes.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Removed difficulty levels.</p>
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>UI Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved changelog, end screen, and How To Play.</p>
+    <p class="changelog-update"><b>Update II: Hangar and Music Update (4/26/2025)</b></p>
+    <p class="changelog-section"><b>Gameplay Changes</b></p>
+    <p class="changelog-entry">-Improved speed ramp-up.</p>
+    <p class="changelog-entry">-Changed obstacle frequency.</p>
+    <p class="changelog-entry">-Added hangar with purchasable ships.</p>
+    <p class="changelog-entry">-Added in-game music.</p>
+    <p class="changelog-entry">-Greatly fixed spaceship hitboxes.</p>
+    <p class="changelog-entry">-Removed difficulty levels.</p>
+    <p class="changelog-section"><b>UI Changes</b></p>
+    <p class="changelog-entry">-Improved changelog, end screen, and How To Play.</p>
     <br>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update II.1: Bug Fix (4/28/2025)</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Rounded scores to integers.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed ship purchase/equip glitches.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Changed source files to Github.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Crisper background image.</p>
+    <p class="changelog-update"><b>Update II.1: Bug Fix (4/28/2025)</b></p>
+    <p class="changelog-entry">-Rounded scores to integers.</p>
+    <p class="changelog-entry">-Fixed ship purchase/equip glitches.</p>
+    <p class="changelog-entry">-Changed source files to Github.</p>
+    <p class="changelog-entry">-Crisper background image.</p>
     <br>
-    <p style="font-size: 30px; font-family: '8bit-font-text'"><b>Update III: We're Back from Summer Break! (In Progress)</b></p>
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Big Deal Stuff Here:</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Completely revamped UI style. The other one sucked, I know.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Mobile support added! Mobile controls are now available. The screen is optimized for mobile devices. It's a bit wonky right now, but it's functional.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Pixel-perfect hitboxes. Okay, I know you're excited about this one. The other system wasn't that bad -- sheesh!</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added explosions and explosion sounds. Big booms. Large explosions. Very good.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added spaceship tilting. Woah! That changes things.</p>
+    <p class="changelog-update"><b>Update III: We're Back from Summer Break! (9/21/2026)</b></p>
+    <p class="changelog-section"><b>Big Deal Stuff Here:</b></p>
+    <p class="changelog-entry">-Completely revamped UI style. The other one sucked, I know.</p>
+    <p class="changelog-entry">-Mobile support added! Mobile controls are now available. The screen is optimized for mobile devices. It's a bit wonky right now, but it's functional.</p>
+    <p class="changelog-entry">-Pixel-perfect hitboxes. Okay, I know you're excited about this one. The other system wasn't that bad -- sheesh!</p>
+    <p class="changelog-entry">-Added explosions and explosion sounds. Big booms. Large explosions. Very good.</p>
+    <p class="changelog-entry">-Added spaceship tilting. Woah! That changes things.</p>
     
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Gameplay Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved gap spawning logic.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added explosions and explosion sounds.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added hover SFX on menu buttons.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added personal best / high score tracker.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Score counter flashes at milestones.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Improved crash feedback.</p>
+    <p class="changelog-section"><b>Other Gameplay Changes</b></p>
+    <p class="changelog-entry">-Improved gap spawning logic.</p>
+    <p class="changelog-entry">-Added explosions and explosion sounds.</p>
+    <p class="changelog-entry">-Added hover SFX on menu buttons.</p>
+    <p class="changelog-entry">-Added personal best / high score tracker.</p>
+    <p class="changelog-entry">-Score counter flashes at milestones.</p>
+    <p class="changelog-entry">-Improved crash feedback.</p>
 
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>UI Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Ship stats now shown as visual bars.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Animated ship preview in hangar.</p>=
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Lock badge shown on ships that can't be purchased.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Settings panel now has volume sliders and hitbox toggle.</p>
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Bug Fixes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed ammo count showing "undefined" before first shot.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed tab-out pause triggering after crash.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed lastGapCenterY not resetting on restart.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed global loop variable bleed in collision detection.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed typo in purchase dialog button ID that caused errors.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed bug where incorrect placement of collision handling code for barriers caused problematic collision detection.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Fixed error where firing the weapon would stop y-axis movement.</p>
-    <p style="font-size: 25px; font-family: '8bit-font-text'"><b>Other Changes</b></p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Added splash text.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-New menu music.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Somewhat cleaned up code.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Score and Ammo HUD now scale with webpage and are no longer drawn on the canvas.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Canvas should now scale dynamically to different screen ratios, sizes, and browser zooms.</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">-Organized game assests.</p>   
+    <p class="changelog-section"><b>UI Changes</b></p>
+    <p class="changelog-entry">-Ship stats now shown as visual bars.</p>
+    <p class="changelog-entry">-Animated ship preview in hangar.</p>
+    <p class="changelog-entry">-Lock badge shown on ships that can't be purchased.</p>
+    <p class="changelog-entry">-Settings panel now has volume sliders and hitbox display toggle.</p>
+    <p class="changelog-entry">-Ammo count is now represented as a visual bar.</p>
+    <p class="changelog-section"><b>Bug Fixes</b></p>
+    <p class="changelog-entry">-Fixed ammo count showing "undefined" before first shot.</p>
+    <p class="changelog-entry">-Fixed tab-out pause triggering after crash.</p>
+    <p class="changelog-entry">-Fixed lastGapCenterY not resetting on restart.</p>
+    <p class="changelog-entry">-Fixed global loop variable bleed in collision detection.</p>
+    <p class="changelog-entry">-Fixed typo in purchase dialog button ID that caused errors.</p>
+    <p class="changelog-entry">-Fixed bug where incorrect placement of collision handling code for barriers caused problematic collision detection.</p>
+    <p class="changelog-entry">-Fixed error where firing the weapon would stop y-axis movement.</p>
+    <p class="changelog-section"><b>Other Changes</b></p>
+    <p class="changelog-entry">-Added splash text.</p>
+    <p class="changelog-entry">-New menu music.</p>
+    <p class="changelog-entry">-Somewhat cleaned up code.</p>
+    <p class="changelog-entry">-Score and Ammo HUD now scale with webpage and are no longer drawn on the canvas.</p>
+    <p class="changelog-entry">-Canvas should now scale dynamically to different screen ratios, sizes, and browser zooms.</p>
+    <p class="changelog-entry">-Organized game assests.</p>
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('changelog') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
 
@@ -1377,12 +1485,14 @@
     <br>
     <p style="font-size: 20px; font-family: '8bit-font-text'">Josiah Burke for gameplay testing.</p>
     <br>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">Jacob Pool for gameplay testing and design feedback.</p>
+    <br>
     <p style="font-size: 20px; font-family: '8bit-font-text'">Other miscellaneous people who have given help and feedback. You know who you are. o7</p>
     <br>
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('credits') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
 
-  <!-- SETTINGS — built dynamically so sliders reflect current values -->
+  <!-- SETTINGSb -->
   <div class="howPlay" id="settings" style="width: min(480px, 90vw);">
     <!-- filled by buildSettingsPanel() on open -->
   </div>
@@ -1428,10 +1538,10 @@
     </div>
 
     <div class="spaceshipSelector" id="spaceshipSelector">
-      <a onclick="setCard('CLASSIC', classicstats) || setPicture(classicSpaceshipPrev)">
+      <a onclick="showShip('classic')">
         <img class="SpaceshipNav" src="./images/classic_spaceship_guns_removed_thrust.png" width="215" height="192">
       </a>
-      <a onclick="setCard('Pixel Piece Prospecter', pixproStats) || setPicture(pieproSpaceshipsPrev)">
+      <a onclick="showShip('pixpro')">
         <img class="SpaceshipNav" src="./images/prospector_spaceship_guns_removed_thrust.png" width="215" height="192">
       </a>
     </div>
