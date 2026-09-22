@@ -251,6 +251,7 @@ var myBackground;
 var myAmmo;
 var myMags = [];
 var speedLines = [];
+const devDiagonalObstacles = new URLSearchParams(window.location.search).has('devDiagonal');
 var crashFlash = { active: false, alpha: 0, elapsed: 0, duration: 18 };
 var crashSlowmo = { active: false, elapsed: 0, duration: 20 };
 
@@ -364,330 +365,6 @@ function setHighScore(score) {
 
 //------------------------------VARIABLES OVER-----------------------------//
 
-
-//--------------------------- DYNAMIC MUSIC ENGINE ---------------------------//
-
-let musicCtx, musicMaster, musicCompressor;
-let musicStarted = false;
-let musicIntensity = 0;
-let musicBpm = 120;
-
-let mStep = 0, mArpStep = 0, mMelStep = 0, mCounterStep = 0, mHarmStep = 0, mPadStep = 0;
-let mChordIdx = 0, mBarCount = 0;
-let mSeqTimer = null;
-
-let mSubOsc, mSubGain;
-let mBassOsc, mBassGain, mBassFilter;
-let mMelOsc, mMelGain, mMelFilter;
-let mArpOsc, mArpGain;
-let mCounterOsc, mCounterGain, mCounterFilter;
-let mHarmOsc, mHarmGain;
-let mPadOscs = [], mPadGains = [];
-let mChaosOsc, mChaosOsc2, mChaosGain;
-let mKickGain, mSnareGain, mHihatGain, mPercGain;
-let mReverbNode, mReverbGain;
-let mDelayNode, mDelayGain, mDelayFeedback;
-
-const mProgressions = [
-  { chords: [[130.81,155.56,196.00],[174.61,207.65,261.63],[196.00,233.08,293.66],[130.81,155.56,196.00]] },
-  { chords: [[130.81,155.56,196.00],[103.83,130.81,155.56],[155.56,196.00,233.08],[116.54,146.83,174.61]] },
-  { chords: [[130.81,155.56,196.00],[174.61,207.65,261.63],[103.83,130.81,155.56],[196.00,233.08,293.66]] },
-  { chords: [[138.59,164.81,207.65],[155.56,185.00,233.08],[174.61,207.65,261.63],[130.81,155.56,196.00]] },
-];
-
-const mBassPatterns = [
-  [130.81,0,0,130.81, 0,0,196.00,0, 174.61,0,0,174.61, 0,0,155.56,0],
-  [130.81,0,130.81,0, 155.56,0,196.00,0, 174.61,0,174.61,0, 155.56,0,130.81,0],
-  [130.81,0,0,0, 155.56,0,0,196.00, 0,174.61,0,0, 155.56,0,130.81,155.56],
-  [130.81,155.56,130.81,155.56, 196.00,174.61,155.56,130.81, 174.61,196.00,174.61,155.56, 130.81,0,196.00,0],
-];
-
-const mScale = [261.63,293.66,311.13,349.23,392.00,415.30,466.16,523.25,587.33,622.25,698.46,784.00,932.33,1046.50];
-
-const mMelPatterns = [
-  [0,2,4,2, 3,2,4,6, 5,4,6,7, 6,4,2,0],
-  [4,6,7,6, 4,3,2,4, 6,7,9,7, 6,4,3,2],
-  [0,0,2,4, 6,4,2,4, 6,7,6,4, 3,2,0,2],
-  [7,6,4,3, 2,4,6,7, 9,7,6,4, 6,7,9,7],
-];
-
-const mArpPatterns = [
-  [0,1,2,1, 0,2,1,0],
-  [0,2,1,2, 0,1,2,0],
-  [2,1,0,1, 2,0,1,2],
-  [0,1,2,0, 2,1,0,2],
-];
-
-const mCounterPatterns = [
-  [6,7,6,4, 5,6,4,2, 3,4,2,0, 1,2,4,3],
-  [9,7,6,7, 9,7,6,4, 6,7,6,4, 3,4,6,4],
-  [4,6,7,9, 7,6,4,6, 7,9,7,6, 4,3,2,4],
-  [9,9,7,6, 7,9,7,6, 4,6,7,9, 11,9,7,6],
-];
-
-const mHarmOffsets = [2,2,3,2,2,3,2,2];
-
-const mDrumPatterns = [
-  "k..h s..h k..h s..h",
-  "k.hh s.hh k.hh s.hh",
-  "kphh sphh kphh sphh",
-  "khhh shhh khhh shhh",
-].map(p => p.replace(/ /g,'').split('').map(c => c === '.' ? '' : c));
-
-function mMakeNoiseBuf(ctx) {
-  const sz = ctx.sampleRate * 2;
-  const buf = ctx.createBuffer(1, sz, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
-  return buf;
-}
-
-function mMakeNoiseSrc(ctx, buf) {
-  const s = ctx.createBufferSource();
-  s.buffer = buf; s.loop = true;
-  return s;
-}
-
-function mTriggerOsc(osc, gainNode, freq, vol, atk, rel, when) {
-  if (!freq) return;
-  osc.frequency.setValueAtTime(freq, when);
-  gainNode.gain.cancelScheduledValues(when);
-  gainNode.gain.setValueAtTime(0.0001, when);
-  gainNode.gain.linearRampToValueAtTime(vol, when + atk);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, when + atk + rel);
-}
-
-function mTriggerNoise(gainNode, vol, atk, rel, when) {
-  gainNode.gain.cancelScheduledValues(when);
-  gainNode.gain.setValueAtTime(0.0001, when);
-  gainNode.gain.linearRampToValueAtTime(vol, when + atk);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, when + atk + rel);
-}
-
-function mBuildReverb(ctx, secs, decay) {
-  const len = ctx.sampleRate * secs;
-  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-  for (let c = 0; c < 2; c++) {
-    const d = buf.getChannelData(c);
-    for (let i = 0; i < len; i++)
-      d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
-  }
-  const conv = ctx.createConvolver();
-  conv.buffer = buf;
-  return conv;
-}
-
-function mTick() {
-  const stepDur = 60 / musicBpm / 4;
-  const now = musicCtx.currentTime;
-  const pi = Math.min(Math.floor(musicIntensity * 4), 3);
-  const chord = mProgressions[pi].chords[mChordIdx % 4];
-  const bassP = mBassPatterns[pi];
-  const melP  = mMelPatterns[pi];
-  const counterP = mCounterPatterns[pi];
-  const drumP = mDrumPatterns[Math.min(pi, 3)];
-  const arpP  = mArpPatterns[pi];
-  const s16   = mStep % 16;
-
-  const bassFreq = bassP[s16];
-  if (bassFreq) {
-    mSubOsc.frequency.setValueAtTime(bassFreq / 2, now);
-    mSubGain.gain.cancelScheduledValues(now);
-    mSubGain.gain.setValueAtTime(0.0001, now);
-    mSubGain.gain.linearRampToValueAtTime(0.22, now + 0.008);
-    mSubGain.gain.exponentialRampToValueAtTime(0.0001, now + stepDur * 1.8);
-  }
-
-  mTriggerOsc(mBassOsc, mBassGain, bassFreq, 0.32, 0.005, stepDur * 0.75, now);
-
-  if (musicIntensity > 0.1) {
-    mTriggerOsc(mMelOsc, mMelGain, mScale[melP[mMelStep % 16]], 0.10 + musicIntensity * 0.12, 0.008, stepDur * 0.6, now);
-    mMelStep++;
-  }
-
-  if (musicIntensity > 0.35) {
-    const hIdx = Math.min(melP[mMelStep % 16] + mHarmOffsets[mStep % 8], mScale.length - 1);
-    mTriggerOsc(mHarmOsc, mHarmGain, mScale[hIdx], 0.06 + musicIntensity * 0.06, 0.01, stepDur * 0.55, now);
-    mHarmStep++;
-  }
-
-  if (musicIntensity > 0.25) {
-    mTriggerOsc(mArpOsc, mArpGain, chord[arpP[mArpStep % arpP.length]] * 2, 0.07 + musicIntensity * 0.09, 0.004, stepDur * 0.35, now);
-    mArpStep++;
-  }
-
-  if (musicIntensity > 0.5 && s16 % 2 === 0) {
-    mTriggerOsc(mCounterOsc, mCounterGain, mScale[counterP[mCounterStep % 16]] * 2, 0.065 + musicIntensity * 0.055, 0.006, stepDur * 0.5, now);
-    mCounterStep++;
-  }
-
-  if (musicIntensity > 0.45 && s16 % 4 === 0) {
-    chord.forEach((f, i) => {
-      if (!mPadOscs[i]) return;
-      mPadOscs[i].frequency.setValueAtTime(f, now);
-      mPadGains[i].gain.cancelScheduledValues(now);
-      mPadGains[i].gain.setValueAtTime(0.0001, now);
-      mPadGains[i].gain.linearRampToValueAtTime(0.04 + musicIntensity * 0.035, now + 0.04);
-      mPadGains[i].gain.exponentialRampToValueAtTime(0.0001, now + stepDur * 5);
-    });
-    mPadStep++;
-  }
-
-  const dc = drumP[s16] || '';
-  if (dc.includes('k')) mTriggerNoise(mKickGain,  0.55 + musicIntensity * 0.3,  0.003, 0.07,  now);
-  if (dc.includes('s') && musicIntensity > 0.18) mTriggerNoise(mSnareGain, 0.38 + musicIntensity * 0.22, 0.003, 0.13, now);
-  if (dc.includes('h') && musicIntensity > 0.38) mTriggerNoise(mHihatGain, 0.12 + musicIntensity * 0.14, 0.002, 0.035, now);
-  if (dc.includes('p') && musicIntensity > 0.55) mTriggerNoise(mPercGain,  0.22 + musicIntensity * 0.12, 0.003, 0.06,  now);
-
-  if (musicIntensity > 0.72) {
-    const cv = (musicIntensity - 0.72) * 0.55;
-    mTriggerOsc(mChaosOsc,  mChaosGain, mScale[Math.floor(Math.random() * mScale.length)] * (2 + Math.random()), cv * 0.6, 0.002, stepDur * 0.25, now);
-    mTriggerOsc(mChaosOsc2, mChaosGain, mScale[Math.floor(Math.random() * mScale.length)] * (3 + Math.random()), cv * 0.4, 0.002, stepDur * 0.20, now);
-  }
-
-  mStep++;
-  if (mStep % 16 === 0) {
-    mBarCount++;
-    mChordIdx = (mChordIdx + 1) % 4;
-    if (mBarCount % 4 === 0 && musicIntensity > 0.5) mMelStep = Math.floor(Math.random() * 4) * 4;
-  }
-
-  const next = now + stepDur;
-  mSeqTimer = setTimeout(mTick, Math.max(0, (next - musicCtx.currentTime) * 1000 - 12));
-}
-
-function startDynamicMusic() {
-  if (musicStarted) return;
-  musicStarted = true;
-
-  musicCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-  musicCompressor = musicCtx.createDynamicsCompressor();
-  musicCompressor.threshold.value = -18;
-  musicCompressor.knee.value = 10;
-  musicCompressor.ratio.value = 6;
-  musicCompressor.attack.value = 0.003;
-  musicCompressor.release.value = 0.18;
-  musicCompressor.connect(musicCtx.destination);
-
-  musicMaster = musicCtx.createGain();
-  musicMaster.gain.value = settingsMusicVol;
-  musicMaster.connect(musicCompressor);
-
-  mReverbNode = mBuildReverb(musicCtx, 1.2, 2.8);
-  mReverbGain = musicCtx.createGain();
-  mReverbGain.gain.value = 0.15;
-  mReverbNode.connect(mReverbGain).connect(musicMaster);
-
-  mDelayNode = musicCtx.createDelay(1.0);
-  mDelayNode.delayTime.value = 0.19;
-  mDelayFeedback = musicCtx.createGain();
-  mDelayFeedback.gain.value = 0.35;
-  mDelayGain = musicCtx.createGain();
-  mDelayGain.gain.value = 0.0;
-  mDelayNode.connect(mDelayFeedback).connect(mDelayNode);
-  mDelayNode.connect(mDelayGain).connect(musicMaster);
-
-  const nBuf = mMakeNoiseBuf(musicCtx);
-
-  function makeFiltered(src, type, freq, Q) {
-    const f = musicCtx.createBiquadFilter();
-    f.type = type; f.frequency.value = freq;
-    if (Q) f.Q.value = Q;
-    const g = musicCtx.createGain(); g.gain.value = 0;
-    src.connect(f).connect(g).connect(musicMaster);
-    src.start();
-    return g;
-  }
-
-  mKickGain  = makeFiltered(mMakeNoiseSrc(musicCtx, nBuf), "lowpass",  160,  null);
-  mSnareGain = makeFiltered(mMakeNoiseSrc(musicCtx, nBuf), "bandpass", 1600, 0.8);
-  mHihatGain = makeFiltered(mMakeNoiseSrc(musicCtx, nBuf), "highpass", 8000, null);
-  mPercGain  = makeFiltered(mMakeNoiseSrc(musicCtx, nBuf), "bandpass", 900,  2.5);
-
-  mSubOsc = musicCtx.createOscillator(); mSubOsc.type = "sine"; mSubOsc.frequency.value = 65.41;
-  mSubGain = musicCtx.createGain(); mSubGain.gain.value = 0;
-  mSubOsc.connect(mSubGain).connect(musicMaster);
-  mSubOsc.start();
-
-  mBassOsc = musicCtx.createOscillator(); mBassOsc.type = "square"; mBassOsc.frequency.value = 130.81;
-  mBassFilter = musicCtx.createBiquadFilter(); mBassFilter.type = "lowpass"; mBassFilter.frequency.value = 700;
-  mBassGain = musicCtx.createGain(); mBassGain.gain.value = 0;
-  mBassOsc.connect(mBassFilter).connect(mBassGain).connect(musicMaster);
-  mBassGain.connect(mReverbNode);
-  mBassOsc.start();
-
-  mMelOsc = musicCtx.createOscillator(); mMelOsc.type = "triangle"; mMelOsc.frequency.value = 440;
-  mMelFilter = musicCtx.createBiquadFilter(); mMelFilter.type = "lowpass"; mMelFilter.frequency.value = 1200;
-  mMelGain = musicCtx.createGain(); mMelGain.gain.value = 0;
-  mMelOsc.connect(mMelFilter).connect(mMelGain).connect(musicMaster);
-  mMelGain.connect(mReverbNode); mMelGain.connect(mDelayNode);
-  mMelOsc.start();
-
-  mHarmOsc = musicCtx.createOscillator(); mHarmOsc.type = "triangle"; mHarmOsc.frequency.value = 523.25;
-  mHarmGain = musicCtx.createGain(); mHarmGain.gain.value = 0;
-  mHarmOsc.connect(mHarmGain).connect(musicMaster);
-  mHarmGain.connect(mReverbNode);
-  mHarmOsc.start();
-
-  mArpOsc = musicCtx.createOscillator(); mArpOsc.type = "square"; mArpOsc.detune.value = 8;
-  mArpGain = musicCtx.createGain(); mArpGain.gain.value = 0;
-  mArpOsc.connect(mArpGain).connect(musicMaster);
-  mArpGain.connect(mDelayNode);
-  mArpOsc.start();
-
-  mCounterOsc = musicCtx.createOscillator(); mCounterOsc.type = "sawtooth"; mCounterOsc.frequency.value = 523.25;
-  mCounterFilter = musicCtx.createBiquadFilter(); mCounterFilter.type = "bandpass"; mCounterFilter.frequency.value = 1400; mCounterFilter.Q.value = 1.2;
-  mCounterGain = musicCtx.createGain(); mCounterGain.gain.value = 0;
-  mCounterOsc.connect(mCounterFilter).connect(mCounterGain).connect(musicMaster);
-  mCounterGain.connect(mReverbNode);
-  mCounterOsc.start();
-
-  for (let i = 0; i < 3; i++) {
-    const o = musicCtx.createOscillator(); o.type = "sine";
-    o.frequency.value = [261.63, 311.13, 392.00][i];
-    const g = musicCtx.createGain(); g.gain.value = 0;
-    o.connect(g).connect(mReverbNode); g.connect(musicMaster);
-    o.start();
-    mPadOscs.push(o); mPadGains.push(g);
-  }
-
-  mChaosOsc = musicCtx.createOscillator(); mChaosOsc.type = "square"; mChaosOsc.frequency.value = 880;
-  mChaosOsc2 = musicCtx.createOscillator(); mChaosOsc2.type = "square"; mChaosOsc2.detune.value = -12;
-  mChaosGain = musicCtx.createGain(); mChaosGain.gain.value = 0;
-  const chaosHP = musicCtx.createBiquadFilter(); chaosHP.type = "highpass"; chaosHP.frequency.value = 600;
-  mChaosOsc.connect(chaosHP); mChaosOsc2.connect(chaosHP);
-  chaosHP.connect(mChaosGain).connect(musicMaster);
-  mChaosGain.connect(mDelayNode);
-  mChaosOsc.start(); mChaosOsc2.start();
-
-  mTick();
-}
-
-function stopDynamicMusic() {
-  if (!musicStarted) return;
-  clearTimeout(mSeqTimer);
-  musicStarted = false;
-  mStep = 0; mArpStep = 0; mMelStep = 0; mCounterStep = 0; mHarmStep = 0; mPadStep = 0;
-  mChordIdx = 0; mBarCount = 0;
-  mPadOscs = []; mPadGains = [];
-  try { musicCtx.close(); } catch(e) {}
-  musicCtx = null;
-}
-
-function updateDynamicMusic(score) {
-  if (!musicStarted) return;
-  musicIntensity = Math.min(score / 2500, 1);
-  musicBpm = 120 + musicIntensity * 70;
-  if (musicMaster)   musicMaster.gain.value         = settingsMusicVol;
-  if (mMelFilter)    mMelFilter.frequency.value     = 600  + musicIntensity * 5000;
-  if (mBassFilter)   mBassFilter.frequency.value    = 400  + musicIntensity * 1200;
-  if (mReverbGain)   mReverbGain.gain.value          = 0.08 + musicIntensity * 0.32;
-  if (mDelayGain)    mDelayGain.gain.value            = musicIntensity > 0.4 ? (musicIntensity - 0.4) * 0.4 : 0;
-  if (mDelayFeedback) mDelayFeedback.gain.value       = 0.25 + musicIntensity * 0.22;
-}
-
-//--------------------------- END DYNAMIC MUSIC ENGINE -----------------------//
 
 function hideDiv(divID) {
   var x = document.getElementById(divID);
@@ -1335,16 +1012,30 @@ function component(width, height, color, x, y, type, secondaryType, healthpoints
 
     if (type == "obstacles" || type == "bullets") {
       ctx.fillStyle = color;
-      ctx.fillRect(this.x + sx, this.y + sy, this.width, this.height);
+      if (this.angle) {
+        ctx.save();
+        ctx.translate(this.x + this.width / 2 + sx, this.y + this.height / 2 + sy);
+        ctx.rotate(this.angle);
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
+      } else {
+        ctx.fillRect(this.x + sx, this.y + sy, this.width, this.height);
+      }
     }
 
     if (secondaryType == "gamePiece" && settingsShowHitbox) {
-      const boxes = getShipHitboxes(this.x, this.y, this.width, this.height, this.tiltAngle || 0);
+      const hitboxes = getShipHitboxes(this.x, this.y, this.width, this.height, this.tiltAngle || 0);
       ctx.strokeStyle = "lime";
       ctx.lineWidth = 2;
-      for (let b = 0; b < boxes.length; b++) {
-        const box = boxes[b];
-        ctx.strokeRect(box.left + sx, box.top + sy, box.right - box.left, box.bottom - box.top);
+      for (let b = 0; b < hitboxes.length; b++) {
+        const polygon = hitboxes[b];
+        ctx.beginPath();
+        ctx.moveTo(polygon[0].x + sx, polygon[0].y + sy);
+        for (let point = 1; point < polygon.length; point++) {
+          ctx.lineTo(polygon[point].x + sx, polygon[point].y + sy);
+        }
+        ctx.closePath();
+        ctx.stroke();
       }
     }
   };
@@ -1371,15 +1062,10 @@ function component(width, height, color, x, y, type, secondaryType, healthpoints
 
   this.crashWith = function(otherobj) {
     if (this == myGamePiece) {
-      const boxes = getShipHitboxes(this.x, this.y, this.width, this.height, this.tiltAngle || 0);
-      for (let b = 0; b < boxes.length; b++) {
-        const box = boxes[b];
-        if (
-          box.right  > otherobj.x &&
-          box.left   < otherobj.x + otherobj.width &&
-          box.bottom > otherobj.y &&
-          box.top    < otherobj.y + otherobj.height
-        ) {
+      const hitboxes = getShipHitboxes(this.x, this.y, this.width, this.height, this.tiltAngle || 0);
+      const obstaclePolygon = getComponentPolygon(otherobj);
+      for (let b = 0; b < hitboxes.length; b++) {
+        if (polygonsIntersect(hitboxes[b], obstaclePolygon)) {
           if (!this.crashed && otherobj.secondaryType !== "mag") {
             this.crashed = true;
             console.log(otherobj.secondaryType)
@@ -1616,7 +1302,8 @@ function updateGameArea(delta = 1) {
   myGameArea.shakeY = shakeY;
 
   myGameArea.clear();
-  myBackground.speedX = -3 * delta;
+  const difficulty = getObstacleDifficultyProfile();
+  myBackground.speedX = -(difficulty.backgroundSpeed) * delta;
   myGameArea.frameNo += 1;
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
@@ -1642,54 +1329,59 @@ function updateGameArea(delta = 1) {
   else                              myGamePiece.tiltTarget =  0;
   myGamePiece.tiltAngle += (myGamePiece.tiltTarget - myGamePiece.tiltAngle) * 0.08;
 
-  if (everyinterval(300)) {
+  if (everyinterval(difficulty.spawnEvery)) {
     x = GAME_WIDTH;
 
     if (myObstacles.spawnCount === undefined) myObstacles.spawnCount = 0;
     myObstacles.spawnCount++;
 
-    const decayRate = 0.95;
+    const decayRate = 0.96;
     const decayFactor = Math.pow(decayRate, myObstacles.spawnCount - 1);
 
-    const baseMinGap = 175;
-    const baseMaxGap = 300;
-    const capGap = 100;
-
-    minGap = Math.max(capGap, capGap + (baseMinGap - capGap) * decayFactor);
-    maxGap = Math.max(capGap, capGap + (baseMaxGap - capGap) * decayFactor);
+    minGap = Math.max(difficulty.gapMin * 0.7, difficulty.gapMin * decayFactor);
+    maxGap = Math.max(difficulty.gapMin, difficulty.gapMax * decayFactor);
 
     if (minGap >= maxGap) {
-      myObstacles.gapR = 100;
+      myObstacles.gapR = difficulty.gapMin;
     } else {
       myObstacles.gapR = Math.floor(Math.random() * (maxGap - minGap + 1) + minGap);
     }
 
-    const maxReach = 600 * Number(getSelectedShipCookie().at(1)) * 5;
-    const minHeightV = 100;
-    const maxHeightV = GAME_HEIGHT - myObstacles.gapR - 100;
+    const minHeightV = difficulty.minTop;
+    const maxHeightV = GAME_HEIGHT - myObstacles.gapR - 80;
+    const maxShift = difficulty.centerShift;
 
     let newHeight;
     if (myObstacles.lastGapCenterY === undefined) {
       newHeight = Math.floor(Math.random() * (maxHeightV - minHeightV + 1) + minHeightV);
     } else {
       const lastCenter = myObstacles.lastGapCenterY;
-      const clampMin = Math.max(minHeightV + myObstacles.gapR / 2, lastCenter - maxReach);
-      const clampMax = Math.min(maxHeightV + myObstacles.gapR / 2, lastCenter + maxReach);
-      const newCenter = Math.floor(Math.random() * (clampMax - clampMin + 1) + clampMin);
+      const minCenter = Math.max(minHeightV + myObstacles.gapR / 2, lastCenter - maxShift);
+      const maxCenter = Math.min(maxHeightV + myObstacles.gapR / 2, lastCenter + maxShift);
+      const safeMin = Math.min(minCenter, maxCenter);
+      const safeMax = Math.max(minCenter, maxCenter);
+      const newCenter = Math.floor(Math.random() * (safeMax - safeMin + 1) + safeMin);
       newHeight = newCenter - myObstacles.gapR / 2;
     }
 
-    myObstacles.heightR = newHeight;
+    myObstacles.heightR = clamp(newHeight, minHeightV, maxHeightV);
     myObstacles.lastGapCenterY = myObstacles.heightR + myObstacles.gapR / 2;
 
-    myObstacles.push(new component(10, myObstacles.heightR, "#FF3F3F", x, 0, "obstacles", "Trobstacle", "n/a"));
-    myObstacles.push(new component(10, x - myObstacles.heightR - myObstacles.gapR, "#FF3F3F", x, myObstacles.heightR + myObstacles.gapR, "obstacles", "Trobstacle", "n/a"));
+    const useDiagonalPattern = devDiagonalObstacles ||
+      (difficulty.stage >= 1 && Math.random() < 0.28 + difficulty.intensity * 0.14);
 
-    const barrierHeight = 100;
-    const gapStart = myObstacles.heightR;
-    const gapEnd   = myObstacles.heightR + myObstacles.gapR;
-    const barrierY = gapStart + Math.floor(Math.random() * (gapEnd - gapStart - barrierHeight));
-    myBarriers.push(new component(10, barrierHeight, "orange", x, barrierY, "obstacles", "n/a", 25));
+    if (useDiagonalPattern) {
+      spawnDiagonalObstacleGroup(x, difficulty);
+    } else {
+      myObstacles.push(new component(10, myObstacles.heightR, "#FF3F3F", x, 0, "obstacles", "Trobstacle", "n/a"));
+      myObstacles.push(new component(10, x - myObstacles.heightR - myObstacles.gapR, "#FF3F3F", x, myObstacles.heightR + myObstacles.gapR, "obstacles", "Trobstacle", "n/a"));
+
+      const barrierHeight = 100;
+      const gapStart = myObstacles.heightR;
+      const gapEnd   = myObstacles.heightR + myObstacles.gapR;
+      const barrierY = gapStart + Math.floor(Math.random() * (gapEnd - gapStart - barrierHeight));
+      myBarriers.push(new component(10, barrierHeight, "orange", x, barrierY, "obstacles", "n/a", 25));
+    }
   }
 
   const random200 = Math.floor(Math.random() * 200) + 1;
@@ -1698,7 +1390,10 @@ function updateGameArea(delta = 1) {
     : GAME_HEIGHT / 2;
 
   if (everyinterval(600)) {
-    myMags.push(new component(10, 10, "./images/ammo_v1.png", GAME_WIDTH - random200, randomGap, "n/a", "mag", "n/a"));
+    const mag = new component(10, 10, "./images/ammo_v1.png", GAME_WIDTH - random200, randomGap, "n/a", "mag", "n/a");
+    mag.baseY = randomGap;
+    mag.bobPhase = Math.random() * Math.PI * 2;
+    myMags.push(mag);
   }
 
   myBackground.newPos();
@@ -1706,15 +1401,16 @@ function updateGameArea(delta = 1) {
   updateAndDrawSpeedLines();
 
   for (let oi = 0; oi < myObstacles.length; oi++) {
-    myObstacles[oi].x += -9 * delta;
+    myObstacles[oi].x += -(difficulty.obstacleSpeed) * delta;
     myObstacles[oi].update();
   }
   for (let bi = 0; bi < myBarriers.length; bi++) {
-    myBarriers[bi].x += -9 * delta;
+    myBarriers[bi].x += -(difficulty.obstacleSpeed) * delta;
     myBarriers[bi].update();
   }
   for (let mi = 0; mi < myMags.length; mi++) {
-    myMags[mi].x += -9 * delta;
+    myMags[mi].x += -(difficulty.obstacleSpeed) * delta;
+    myMags[mi].y = (myMags[mi].baseY ?? myMags[mi].y) + Math.sin((myGameArea.frameNo * 0.12) + (myMags[mi].bobPhase ?? 0)) * 5;
     myMags[mi].update();
   }
 
@@ -1767,6 +1463,70 @@ function updateGameArea(delta = 1) {
 
   updateExplosions();
   drawExplosions();
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getGameIntensityFromScore(score) {
+  return Math.min(score / 5000, 1);
+}
+
+function getObstacleDifficultyProfile() {
+  const score = (myGameArea.frameNo / 4) * Number(getSelectedShipCookie().at(7));
+  const intensity = getGameIntensityFromScore(score);
+  const stage = Math.min(5, Math.floor(intensity * 5));
+
+  return {
+    stage,
+    intensity,
+    gapMin: Math.max(120, 175 - stage * 10),
+    gapMax: Math.min(360, 300 + stage * 16),
+    centerShift: Math.min(220, 150 + stage * 30 + Number(getSelectedShipCookie().at(1)) * 20),
+    minTop: 80,
+    maxBottom: GAME_HEIGHT - 80,
+    spawnEvery: Math.max(180, 300 - stage * 12),
+    obstacleSpeed: 8 + intensity * 6,
+    backgroundSpeed: 3 + intensity * 2
+  };
+}
+
+function spawnDiagonalObstacleGroup(x, difficulty) {
+  const diagonalAngle = Math.random() < 0.5 ? -0.10 : 0.10;
+  const upperWall = new component(
+    10,
+    myObstacles.heightR,
+    "#FF3F3F",
+    x,
+    0,
+    "obstacles",
+    "DiagonalObstacle",
+    "n/a"
+  );
+  upperWall.angle = diagonalAngle;
+
+  const lowerWall = new component(
+    10,
+    GAME_HEIGHT - myObstacles.heightR - myObstacles.gapR,
+    "#FF3F3F",
+    x,
+    myObstacles.heightR + myObstacles.gapR,
+    "obstacles",
+    "DiagonalObstacle",
+    "n/a"
+  );
+  lowerWall.angle = diagonalAngle;
+
+  const barrierHeight = 100;
+  const gapStart = myObstacles.heightR;
+  const gapEnd = gapStart + myObstacles.gapR;
+  const barrierY = gapStart + Math.floor(Math.random() * (gapEnd - gapStart - barrierHeight));
+  const barrier = new component(10, barrierHeight, "orange", x, barrierY, "obstacles", "DiagonalObstacle", 25);
+  barrier.angle = diagonalAngle;
+
+  myObstacles.push(upperWall, lowerWall);
+  myBarriers.push(barrier);
 }
 
 function everyinterval(n) {
@@ -1822,6 +1582,7 @@ function fireBullet() {
       const b = new component(30, 7, "yellow", myGamePiece.x + 110, (myGamePiece.y + Number(myGamePiece.gunPosY)), "bullets", "n/a", "n/a");
       b.baseBulletSpeedX = bulletSpeedX;
       b.baseBulletSpeedY = bulletSpeedY;
+      b.angle = tilt;
       myBullets.push(b);
       myGamePiece.ammo -= 1;
       updateHUDs();
@@ -1834,6 +1595,8 @@ function fireBullet() {
       b1.baseBulletSpeedY = bulletSpeedY;
       b2.baseBulletSpeedX = bulletSpeedX;
       b2.baseBulletSpeedY = bulletSpeedY;
+      b1.angle = tilt;
+      b2.angle = tilt;
       myBullets.push(b1, b2);
       myGamePiece.ammo -= 2;
       updateHUDs();
@@ -1907,69 +1670,79 @@ document.addEventListener("mouseover", e => {
 
 
 function getShipHitboxes(x, y, w, h, angle) {
-  angle = angle || 0;
   const shipCX = x + (w + 15) / 2;
   const shipCY = y + (h + 15) / 2;
+  const cosA = Math.cos(angle || 0);
+  const sinA = Math.sin(angle || 0);
+  const rotatePoint = (px, py) => ({
+    x: shipCX + px * cosA - py * sinA,
+    y: shipCY + px * sinA + py * cosA,
+  });
+  const scaleX = (w + 15) / 125;
+  const scaleY = (h + 15) / 105;
+
+  function polygon(points) {
+    return points.map(([px, py]) => rotatePoint(px * scaleX, py * scaleY));
+  }
+
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const shipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+  const normalizedPolygons = window.SHIP_HITBOXES[shipKey];
+
+  return normalizedPolygons.map(points => points.map(point => rotatePoint(
+    point.x * 125 * scaleX,
+    point.y * 105 * scaleY
+  )));
+}
+
+function getComponentPolygon(component) {
+  const centerX = component.x + component.width / 2;
+  const centerY = component.y + component.height / 2;
+  const halfWidth = component.width / 2;
+  const halfHeight = component.height / 2;
+  const angle = component.angle || 0;
   const cosA = Math.cos(angle);
   const sinA = Math.sin(angle);
-
-  function rotatePoint(px, py) {
-    const dx = px - shipCX;
-    const dy = py - shipCY;
-    return {
-      x: shipCX + dx * cosA - dy * sinA,
-      y: shipCY + dx * sinA + dy * cosA
-    };
-  }
-
-  function box(centerX, centerY, halfW, halfH) {
-    const nudgeX = 12;
-    const nudgeY = 0;
-    const thickenX = 0.0;
-    const thickenY = 0.2;
-    const stretchCenterY = 0.1;
-    const stretchCenterX = 0.5;
-    const stretchedCenterY = centerY + (centerY - stretchCenterY) * thickenY;
-    const stretchedCenterX = centerX + (centerX - stretchCenterX) * thickenX;
-    const cx = x + w * stretchedCenterX + nudgeX;
-    const cy = y + h * stretchedCenterY + nudgeY;
-    const hw = w * halfW * (1 + thickenX);
-    const hh = h * halfH * (1 + thickenY);
-
-    // Four corners of the unrotated box
-    const corners = [
-      rotatePoint(cx - hw, cy - hh),
-      rotatePoint(cx + hw, cy - hh),
-      rotatePoint(cx + hw, cy + hh),
-      rotatePoint(cx - hw, cy + hh),
-    ];
-
-    // AABB from rotated corners
-    const xs = corners.map(c => c.x);
-    const ys = corners.map(c => c.y);
-    return {
-      left:   Math.min(...xs),
-      right:  Math.max(...xs),
-      top:    Math.min(...ys),
-      bottom: Math.max(...ys),
-    };
-  }
-
   return [
-    box(0.721, 0.503, 0.271, 0.059),
-    box(0.646, 0.410, 0.245, 0.025),
-    box(0.547, 0.345, 0.197, 0.027),
-    box(0.495, 0.285, 0.191, 0.024),
-    box(0.369, 0.188, 0.222, 0.063),
-    box(0.448, 0.094, 0.196, 0.026),
-    box(0.647, 0.594, 0.246, 0.034),
-    box(0.546, 0.659, 0.198, 0.028),
-    box(0.498, 0.721, 0.199, 0.027),
-    box(0.373, 0.816, 0.224, 0.061),
-    box(0.447, 0.906, 0.201, 0.028),
-    box(0.348, 0.971, 0.149, 0.025),
-    box(0.347, 0.034, 0.147, 0.032),
-  ];
+    [-halfWidth, -halfHeight],
+    [halfWidth, -halfHeight],
+    [halfWidth, halfHeight],
+    [-halfWidth, halfHeight],
+  ].map(([px, py]) => ({
+    x: centerX + px * cosA - py * sinA,
+    y: centerY + px * sinA + py * cosA,
+  }));
+}
+
+function polygonsIntersect(first, second) {
+  const polygons = [first, second];
+  for (const polygon of polygons) {
+    for (let index = 0; index < polygon.length; index++) {
+      const next = polygon[(index + 1) % polygon.length];
+      const edgeX = next.x - polygon[index].x;
+      const edgeY = next.y - polygon[index].y;
+      const axisX = -edgeY;
+      const axisY = edgeX;
+      let firstMin = Infinity;
+      let firstMax = -Infinity;
+      let secondMin = Infinity;
+      let secondMax = -Infinity;
+
+      for (const point of first) {
+        const projection = point.x * axisX + point.y * axisY;
+        firstMin = Math.min(firstMin, projection);
+        firstMax = Math.max(firstMax, projection);
+      }
+      for (const point of second) {
+        const projection = point.x * axisX + point.y * axisY;
+        secondMin = Math.min(secondMin, projection);
+        secondMax = Math.max(secondMax, projection);
+      }
+
+      if (firstMax < secondMin || secondMax < firstMin) return false;
+    }
+  }
+  return true;
 }
 
 //------------------------Pausing----------------------------//

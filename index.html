@@ -22,17 +22,44 @@ fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/de
   .then(html => {
     document.body.innerHTML = html;
 
-    const script = document.createElement('script');
-    script.src = `./script.js?v=${Date.now()}`;
-    script.onload = () => {
-      console.log('Remote script loaded successfully');
-      queryShipCookie() || showShip('classic');
+    const musicScript = document.createElement('script');
+    musicScript.src = `./music.js?v=${Date.now()}`;
+    musicScript.onload = () => {
+      const hitboxScript = document.createElement('script');
+      hitboxScript.src = `./hitboxes/classic.js?v=${Date.now()}`;
+      hitboxScript.onload = () => {
+      const prospectorHitboxScript = document.createElement('script');
+      prospectorHitboxScript.src = `./hitboxes/pixpro.js?v=${Date.now()}`;
+      prospectorHitboxScript.onload = () => {
+        const script = document.createElement('script');
+        script.src = `./script.js?v=${Date.now()}`;
+        script.onload = () => {
+          console.log('Remote script loaded successfully');
+          queryShipCookie() || showShip('classic');
+        };
+        script.onerror = () => {
+          console.error('Failed to load remote script, trying local fallback...');
+          loadLocalFallback();
+        };
+        document.body.appendChild(script);
+      };
+      prospectorHitboxScript.onerror = () => {
+        console.error('Failed to load remote Prospector hitboxes, trying local fallback...');
+        loadLocalFallback();
+      };
+      document.body.appendChild(prospectorHitboxScript);
+      };
+      hitboxScript.onerror = () => {
+        console.error('Failed to load remote classic hitboxes, trying local fallback...');
+        loadLocalFallback();
+      };
+      document.body.appendChild(hitboxScript);
     };
-    script.onerror = () => {
-      console.error('Failed to load remote script, trying local fallback...');
+    musicScript.onerror = () => {
+      console.error('Failed to load remote music script, trying local fallback...');
       loadLocalFallback();
     };
-    document.body.appendChild(script);
+    document.body.appendChild(musicScript);
   })
   .catch(error => {
     console.warn('Remote fetch failed, reverting to local files:', error);
@@ -64,16 +91,40 @@ function loadLocalFallback() {
     .then(html => {
       document.body.innerHTML = html;
       
-      const script = document.createElement('script');
-      script.src = `./script.js?v=${Date.now()}`;
-      script.onload = () => {
-        console.log('Local fallback loaded successfully');
-        queryShipCookie() || showShip('classic');
+      const musicScript = document.createElement('script');
+      musicScript.src = `./music.js?v=${Date.now()}`;
+      musicScript.onload = () => {
+        const hitboxScript = document.createElement('script');
+        hitboxScript.src = `./hitboxes/classic.js?v=${Date.now()}`;
+        hitboxScript.onload = () => {
+        const prospectorHitboxScript = document.createElement('script');
+        prospectorHitboxScript.src = `./hitboxes/pixpro.js?v=${Date.now()}`;
+        prospectorHitboxScript.onload = () => {
+          const script = document.createElement('script');
+          script.src = `./script.js?v=${Date.now()}`;
+          script.onload = () => {
+            console.log('Local fallback loaded successfully');
+            queryShipCookie() || showShip('classic');
+          };
+          script.onerror = () => {
+            console.error('Local script also failed!');
+          };
+          document.body.appendChild(script);
+        };
+        prospectorHitboxScript.onerror = () => {
+          console.error('Local Prospector hitboxes also failed!');
+        };
+        document.body.appendChild(prospectorHitboxScript);
+        };
+        hitboxScript.onerror = () => {
+          console.error('Local classic hitboxes also failed!');
+        };
+        document.body.appendChild(hitboxScript);
       };
-      script.onerror = () => {
-        console.error('Local script also failed!');
+      musicScript.onerror = () => {
+        console.error('Local music script also failed!');
       };
-      document.body.appendChild(script);
+      document.body.appendChild(musicScript);
     })
     .catch(err => {
       console.error('Fallback failed completely:', err);
