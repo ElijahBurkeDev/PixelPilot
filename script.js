@@ -1487,7 +1487,7 @@ function getObstacleDifficultyProfile() {
     minTop: 80,
     maxBottom: GAME_HEIGHT - 80,
     spawnEvery: Math.max(180, 300 - stage * 12),
-    obstacleSpeed: 8 + intensity * 6,
+    obstacleSpeed: 8 + intensity * 6, //
     backgroundSpeed: 3 + intensity * 2
   };
 }
