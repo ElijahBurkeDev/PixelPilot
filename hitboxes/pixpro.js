@@ -18,3 +18,4 @@ window.SHIP_HITBOXES.pixpro = [
     { x: 0.250, y: 0.125 }
   ]
 ];
+// test
