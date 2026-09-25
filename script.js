@@ -10,7 +10,7 @@ window.Userback = window.Userback || {};
 const SPACESHIPS = {
   classic: {
     name: 'CLASSIC',
-    image: './images/classic_spaceship_guns_removed_thrust.png',
+    image: './images/spaceships/classic/classic.png',
     gunPosX: 50,
     gunPosY: 50,
     width: 110,
@@ -32,7 +32,7 @@ const SPACESHIPS = {
   },
   pixpro: {
     name: 'Pixel Piece Prospecter',
-    image: './images/prospector_spaceship_guns_removed_thrust.png',
+    image: './images/spaceships/pixpro/pixpro.png',
     gunPosX: 50,
     gunPosY: 50,
     width: 110,
@@ -65,11 +65,126 @@ const GUNS = {
     }
 }
 
-function getShipStatsMarkup(ship) {
+const SHIP_UPGRADE_CONFIG = {
+  classic: {
+    doubleGunPrice: 10000,
+    afterburnerPrice: 15000,
+    upgradedImage: './images/spaceships/classic/classic_double_guns.png',
+  },
+  pixpro: {
+    doubleGunPrice: 25000,
+    afterburnerPrice: 15000,
+    upgradedImage: './images/spaceships/pixpro/pixpro_double_guns.png',
+  },
+};
+
+let viewedShipKey = 'classic';
+
+function getShipUpgradeState(shipKey) {
+  const stored = saveData?.upgrades?.[shipKey] || {};
+  return {
+    doubleGun: stored.doubleGun === true,
+    afterburner: stored.afterburner === true,
+    aimDistance: Math.min(2000, Math.max(200, Number(stored.aimDistance) || 600)),
+  };
+}
+
+function saveShipUpgradeState(shipKey, changes) {
+  saveData.upgrades = saveData.upgrades || {};
+  saveData.upgrades[shipKey] = { ...getShipUpgradeState(shipKey), ...changes };
+  saveGame();
+}
+
+function purchaseShipDoubleGun(shipKey) {
+  const config = SHIP_UPGRADE_CONFIG[shipKey];
+  const ship = SPACESHIPS[shipKey];
+  const upgrade = getShipUpgradeState(shipKey);
+  const owned = ship && (ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey]);
+  if (!config || !owned || upgrade.doubleGun) return;
+  if (getScoreCookie() < config.doubleGunPrice) {
+    purchaseAttemptFailed(config.doubleGunPrice);
+    return;
+  }
+  setScoreCookie(getScoreCookie() - config.doubleGunPrice);
+  saveShipUpgradeState(shipKey, { doubleGun: true });
+  if (getSelectedShipCookie().at(11) === SPACESHIPS[shipKey].name) equipShip(shipKey);
+  if (viewedShipKey === shipKey) showShip(shipKey);
+  updateUpgradePanel();
+  updateShipNavImages();
+  setScorebar();
+}
+
+function purchaseShipAfterburner(shipKey) {
+  const config = SHIP_UPGRADE_CONFIG[shipKey];
+  const ship = SPACESHIPS[shipKey];
+  const upgrade = getShipUpgradeState(shipKey);
+  const owned = ship && (ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey]);
+  if (!config || !owned || upgrade.afterburner) return;
+  if (getScoreCookie() < config.afterburnerPrice) {
+    purchaseAttemptFailed(config.afterburnerPrice);
+    return;
+  }
+  setScoreCookie(getScoreCookie() - config.afterburnerPrice);
+  saveShipUpgradeState(shipKey, { afterburner: true });
+  if (viewedShipKey === shipKey) showShip(shipKey);
+  updateUpgradePanel();
+  setScorebar();
+}
+
+
+function updateShipAimDistance(shipKey, value) {
+  saveShipUpgradeState(shipKey, { aimDistance: Number(value) });
+  updateUpgradePanel();
+}
+
+function updateUpgradePanel() {
+  const panel = document.getElementById('upgradePanel');
+  const ship = SPACESHIPS[viewedShipKey];
+  const config = SHIP_UPGRADE_CONFIG[viewedShipKey];
+  if (!panel || !ship || !config) return;
+
+  const upgrade = getShipUpgradeState(viewedShipKey);
+  const owned = ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey];
+
+  const doubleGunAffordable = getScoreCookie() >= config.doubleGunPrice;
+  const afterburnerAffordable = getScoreCookie() >= config.afterburnerPrice;
+
+  panel.innerHTML = `
+    <h2>SHIP UPGRADES</h2>
+    <h3>DUAL ASTROPOPPERS</h3>
+    <p>${upgrade.doubleGun ? 'Installed: two side-mounted guns.' : `Cost: ${config.doubleGunPrice.toLocaleString()} PP`}</p>
+    ${!owned
+      ? '<p style="color:#e8c84a;">PURCHASE THE SHIP FIRST</p>'
+      : upgrade.doubleGun
+      ? '<p style="color:#4adc6e;">PURCHASED</p>'
+      : doubleGunAffordable
+        ? `<button class="button buttonPurchase" onclick="purchaseShipDoubleGun('${viewedShipKey}')">Purchase</button>`
+        : `<div class="shipLockBadge">Need ${(config.doubleGunPrice - getScoreCookie()).toLocaleString()} more PP</div>`
+    }
+
+    <h3>AFTERBURNER</h3>
+    <p>Hold <b>SHIFT</b> to fly 2× faster!</p>
+    <p>${upgrade.afterburner ? 'Installed: Afterburners enabled.' : `Cost: ${config.afterburnerPrice.toLocaleString()} PP`}</p>
+    ${!owned
+      ? '<p style="color:#e8c84a;">PURCHASE THE SHIP FIRST</p>'
+      : upgrade.afterburner
+      ? '<p style="color:#4adc6e;">PURCHASED</p>'
+      : afterburnerAffordable
+        ? `<button class="button buttonPurchase" onclick="purchaseShipAfterburner('${viewedShipKey}')">Purchase</button>`
+        : `<div class="shipLockBadge">Need ${(config.afterburnerPrice - getScoreCookie()).toLocaleString()} more PP</div>`
+    }
+
+    <h3>AIM CONVERGENCE</h3>
+    <p>Shots converge after <span class="upgradeValue">${upgrade.aimDistance} px</span></p>
+    <input type="range" min="200" max="2000" step="25" value="${upgrade.aimDistance}" ${upgrade.doubleGun && owned ? '' : 'disabled'} oninput="updateShipAimDistance('${viewedShipKey}', this.value)">`;
+}
+
+function getShipStatsMarkup(ship, shipKey) {
   const stats = ship.stats;
   const gun = GUNS[ship.guns];
   const price = ship.price === 0 ? 'Free' : `${ship.price}PP`;
-  const gunLabel = `${ship.numberOfGuns}x ${gun.name}`;
+  const gunCount = getShipUpgradeState(shipKey).doubleGun ? 2 : ship.numberOfGuns;
+  const gunLabel = `${gunCount}x ${gun.name}`;
   const gunTooltip = `<span class="gun-tooltip" role="tooltip">
     <strong>${gun.name}</strong>
     <span><b>Cooldown:</b> ${gun.cooldown} second${gun.cooldown === 1 ? '' : 's'}</span>
@@ -79,18 +194,48 @@ function getShipStatsMarkup(ship) {
   </span>`;
   return `<span style="font-size: 16px; font-family: '8bit-font-text'; color: #c8c8d0;">PRICE: ${price}</span>`
     + buildStatBars(stats.speed, stats.maneuverability, stats.multiplier, stats.hullSize)
-    + `<span style="font-size: 14px; font-family: '8bit-font-text'; color: #c8c8d0;">\n<br> WEAPON // <span class="gun-tooltip-trigger" tabindex="0">${gunLabel}${gunTooltip}</span>\n<br><br>${stats.writeUp}</span><br>`;
+    + `<span style="font-size: 14px; font-family: '8bit-font-text'; color: #c8c8d0;">\n<br> WEAPON // <span class="gun-tooltip-trigger" tabindex="0">${gunLabel}${gunCount === 1 ? '' : 's'}${gunTooltip}</span>\n<br><br>${stats.writeUp}</span><br>`;
 }
 
-function getShipPreview(ship) { return `<img class="shipPrev" src="${ship.image}">`; }
+function getShipPreview(ship, shipKey) {
+  const image = getShipUpgradeState(shipKey).doubleGun
+    ? SHIP_UPGRADE_CONFIG[shipKey].upgradedImage
+    : ship.image;
+  return `<img class="shipPrev" src="${image}">`;
+}
+
+function getShipButtonImage(ship, shipKey) {
+  const image = getShipUpgradeState(shipKey).doubleGun
+    ? SHIP_UPGRADE_CONFIG[shipKey].upgradedImage
+    : ship.image;
+  return image;
+}
+
+function updateShipNavImages() {
+  const navShips = ['classic', 'pixpro'];
+
+  navShips.forEach(shipKey => {
+    const imgElement = document.getElementById(`nav-img-${shipKey}`);
+    
+    if (imgElement && SPACESHIPS[shipKey]) {
+      const correctUrl = getShipButtonImage(SPACESHIPS[shipKey], shipKey);
+      
+      imgElement.src = correctUrl;
+    }
+  });
+}
 
 function equipShip(shipKey, button) {
   const ship = SPACESHIPS[shipKey];
   const stats = ship.stats;
   const gun = GUNS[ship.guns];
   const controls = ship.controls;
-  setSelectedShipCookie(stats.speed, controls.sensitivity, gun.code, gun.cooldown, gun.fireModes.toLowerCase(), ship.gunPosX, ship.gunPosY, stats.multiplier, ship.width, ship.height, ship.image, ship.name);
-  shipEquiped(button);
+  const image = getShipUpgradeState(shipKey).doubleGun
+    ? SHIP_UPGRADE_CONFIG[shipKey].upgradedImage
+    : ship.image;
+  setSelectedShipCookie(stats.speed, controls.sensitivity, gun.code, gun.cooldown, gun.fireModes.toLowerCase(), ship.gunPosX, ship.gunPosY, stats.multiplier, ship.width, ship.height, image, ship.name);
+  if (button) shipEquiped(button);
+  updateUpgradePanel();
 }
 
 function getEquipButton(shipKey) { return `<br><br><button class="button buttonPurchase" onclick="equipShip('${shipKey}', this)">Equip Ship</button>`; }
@@ -98,9 +243,11 @@ function getEquipButton(shipKey) { return `<br><br><button class="button buttonP
 function getPurchaseButton(ship) { return `<button id="${ship.purchasedKey}PurchaseButton" class="button buttonPurchase" onclick="purchaseAttempt(${ship.price}, '${ship.purchasedKey}')">Purchase Ship</button><br>`; }
 
 function showShip(shipKey) {
+  viewedShipKey = shipKey;
   const ship = SPACESHIPS[shipKey];
-  setPicture(getShipPreview(ship));
+  setPicture(getShipPreview(ship, shipKey));
   setCard(shipKey);
+  updateUpgradePanel();
 }
 
 
@@ -299,23 +446,27 @@ function drawExplosions() {
     const sx = myGameArea.shakeX || 0;
     const sy = myGameArea.shakeY || 0;
     const score = myGameArea.frameNo / 4 * getSelectedShipCookie().at(7);
-    const intensity = Math.min(score / 8000, 1);
-    if (intensity < 0.15) return;
+    const scoreIntensity = Math.min(score / 8000, 1);
+    const afterburnerIntensity = afterburnerSpeedMultiplier > 1.05 ? (afterburnerSpeedMultiplier - 1) : 0;
+    const totalIntensity = Math.max(scoreIntensity, afterburnerIntensity);
+    
+    if (totalIntensity < 0.1) return;
 
-    if (Math.random() < intensity * 0.4) {
+    const spawnChance = afterburnerActive ? totalIntensity * 0.6 : totalIntensity * 0.4;
+    if (Math.random() < spawnChance) {
       speedLines.push({
         x: GAME_WIDTH,
         y: Math.random() * GAME_HEIGHT,
-        length: 60 + Math.random() * 180 * intensity,
-        speed: 18 + Math.random() * 14 * intensity,
-        alpha: 0.08 + Math.random() * 0.13 * intensity,
-        width: 0.5 + Math.random() * 1.0,
+        length: 60 + Math.random() * 180 * totalIntensity,
+        speed: 18 + Math.random() * 14 * afterburnerSpeedMultiplier,
+        alpha: 0.08 + Math.random() * 0.13 * totalIntensity,
+        width: 0.5 + Math.random() * 1.0 * afterburnerSpeedMultiplier,
       });
     }
 
     for (let i = speedLines.length - 1; i >= 0; i--) {
       const l = speedLines[i];
-      l.x -= l.speed;
+      l.x -= l.speed * afterburnerSpeedMultiplier;
       if (l.x + l.length < 0) { speedLines.splice(i, 1); continue; }
       ctx.strokeStyle = `rgba(200, 210, 255, ${l.alpha})`;
       ctx.lineWidth = l.width;
@@ -325,8 +476,6 @@ function drawExplosions() {
       ctx.stroke();
     }
   }
-
-
 
   function drawCrashFlash() {
   if (!crashFlash.active) return;
@@ -388,7 +537,7 @@ function setCard(shipKey) {
   var x = document.getElementById("spaceshipName");
   x.innerHTML = ship.name;
   var y = document.getElementById("spaceshipStats");
-  y.innerHTML = getShipStatsMarkup(ship);
+  y.innerHTML = getShipStatsMarkup(ship, shipKey);
   const pp = getScoreCookie();
 
   if (ship.purchasedKey) {
@@ -452,13 +601,45 @@ function updateHUDs(currentScore) {
     if (ammoEl) {
       ammoEl.style.display = 'flex';
       const ammo = myGamePiece && myGamePiece.ammo != null ? myGamePiece.ammo : 0;
-      const maxAmmo = 8;
+      const maxAmmo = getMaxAmmo();
       ammoEl.setAttribute('aria-label', `Ammo: ${ammo} of ${maxAmmo}`);
       ammoEl.innerHTML = Array.from({ length: maxAmmo }, (_, index) =>
         `<span class="ammo-cell${index < ammo ? ' is-loaded' : ''}" aria-hidden="true"></span>`
       ).join('');
     }
   } catch (e) { /* ignore */ }
+}
+
+// Update heat gauge
+function updateHeatGauge() {
+  let gaugeEl = document.getElementById('heatGauge');
+  let gaugeFill = document.getElementById('heatGaugeFill');
+  let gaugeText = document.getElementById('heatGaugeText');
+  
+  if (!gaugeEl) return;
+  
+  const pct = Math.min(100, currentHeat);
+  if (gaugeFill) {
+    gaugeFill.style.width = pct + '%';
+    // Color changes based on heat level
+    if (currentHeat >= OVERHEAT_WARNING_THRESHOLD) {
+      gaugeFill.style.background = '#ff3333';
+      gaugeFill.style.boxShadow = '0 0 10px #ff3333';
+    } else {
+      gaugeFill.style.background = '#e8c84a';
+      gaugeFill.style.boxShadow = 'none';
+    }
+  }
+  if (gaugeText) {
+    gaugeText.textContent = Math.round(currentHeat) + '%';
+    if (currentHeat >= OVERHEAT_WARNING_THRESHOLD) {
+      gaugeText.style.color = '#ff3333';
+      gaugeText.style.textShadow = '0 0 8px #ff3333';
+    } else {
+      gaugeText.style.color = '#e8c84a';
+      gaugeText.style.textShadow = 'none';
+    }
+  }
 }
 
 function addScore(score) {
@@ -537,6 +718,19 @@ const DEFAULT_SAVE = {
     sfxVolume: 0.25,
     showHitboxes: false,
   },
+
+  upgrades: {
+    classic: {
+      doubleGun: false,
+      afterburner: false,
+      aimDistance: 600,
+    },
+    pixpro: {
+      doubleGun: false,
+      afterburner: false,
+      aimDistance: 600,
+    },
+  },
 };
 
 function loadSave() {
@@ -578,6 +772,24 @@ function loadSave() {
         ...(storedSave.settings && typeof storedSave.settings === 'object'
           ? storedSave.settings
           : {}),
+      },
+      upgrades: {
+        ...defaultSave.upgrades,
+        ...(storedSave.upgrades && typeof storedSave.upgrades === 'object'
+          ? storedSave.upgrades
+          : {}),
+        classic: {
+          ...defaultSave.upgrades.classic,
+          ...(storedSave.upgrades?.classic && typeof storedSave.upgrades.classic === 'object'
+            ? storedSave.upgrades.classic
+            : {}),
+        },
+        pixpro: {
+          ...defaultSave.upgrades.pixpro,
+          ...(storedSave.upgrades?.pixpro && typeof storedSave.upgrades.pixpro === 'object'
+            ? storedSave.upgrades.pixpro
+            : {}),
+        },
       },
     };
   } catch (err) {
@@ -671,6 +883,10 @@ function setSelectedShipCookie(
 function getSelectedShipCookie() {
   const s = saveData.selectedShip;
   const gunCode = typeof s.guns === 'string' ? s.guns : GUNS[SPACESHIPS.classic.guns].code;
+  const shipKey = s.name === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+  const image = getShipUpgradeState(shipKey).doubleGun
+    ? SHIP_UPGRADE_CONFIG[shipKey].upgradedImage
+    : s.image;
 
   return [
     s.speed,
@@ -683,7 +899,7 @@ function getSelectedShipCookie() {
     s.multiplier,
     s.width,
     s.height,
-    s.image,
+    image,
     s.name,
   ];
 }
@@ -726,7 +942,7 @@ function getSpaceshipsCookie() {
 /* ---------------- INITIALIZATION ---------------- */
 
 function queryShipCookie() {
-  if (!saveData.selectedShip || !saveData.purchasedShips || !saveData.settings) {
+  if (!saveData.selectedShip || !saveData.purchasedShips || !saveData.settings || !saveData.upgrades) {
     saveData = {
       ...structuredClone(DEFAULT_SAVE),
       ...saveData,
@@ -742,6 +958,18 @@ function queryShipCookie() {
         ...DEFAULT_SAVE.settings,
         ...(saveData.settings || {}),
       },
+      upgrades: {
+        ...DEFAULT_SAVE.upgrades,
+        ...(saveData.upgrades || {}),
+        classic: {
+          ...DEFAULT_SAVE.upgrades.classic,
+          ...(saveData.upgrades?.classic || {}),
+        },
+        pixpro: {
+          ...DEFAULT_SAVE.upgrades.pixpro,
+          ...(saveData.upgrades?.pixpro || {}),
+        },
+      },
     };
     saveGame();
   }
@@ -756,6 +984,9 @@ function startGame() {
     return false;
   }
 
+  // Create heat gauge on first game start
+  createHeatGauge();
+
   myGamePiece = new component(
     Number(getSelectedShipCookie().at(8)),
     Number(getSelectedShipCookie().at(9)),
@@ -768,14 +999,14 @@ function startGame() {
   );
   myGamePiece.tiltAngle = 0;
   myGamePiece.tiltTarget = 0;
-  myGamePiece.ammo = 8;
+  myGamePiece.ammo = getMaxAmmo();
   // HUDs are now DOM elements, not drawn on canvas
   updateHUDs(0);
   myObstacle  = new component(30, 20, "black", 10, 0, "obstacle", "n/a", "n/a");
   myBackground = new component(
       GAME_WIDTH,
       GAME_HEIGHT,
-      "./images/Pixel_Space.png",
+      "./images/backgrounds/standard_background.png",
       0,
       0,
       "background",
@@ -796,9 +1027,10 @@ function startGame() {
   if (hsEl) { hsEl.style.display = 'block'; hsEl.textContent = 'BEST: ' + getHighScore().toLocaleString(); }
 }
 
+
 function restartGame() {
   myGameArea.stop();
-  myGamePiece.ammo = 8;
+  myGamePiece.ammo = getMaxAmmo();
   firstShot = true;
   myGamePiece = null;
   myObstacles = [];
@@ -813,12 +1045,16 @@ function restartGame() {
   speedLines = [];
   screenShake.active = false; 
   screenShake.intensity = 0;
+  afterburnerShakeIntensity = 0;
   crashFlash.active = false;
   crashFlash.alpha = 0;
   crashFlash.elapsed = 0;
   crashSlowmo.active = false;
   crashSlowmo.elapsed = 0;
   lastDisplayedScore = 0;
+  shipAfterburnerOffset = 0;
+  afterburnerActive = false;
+  afterburnerSpeedMultiplier = 1;
   myGameArea.context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   hideDiv('endScreen');
   startGame();
@@ -826,7 +1062,11 @@ function restartGame() {
   explosionSound.stop();
   myGameArea.lastTime = 0;
   gamePaused = false;
+  currentHeat = 0;
+  deathCause = 'crash';
+  engineFlames = [];
 }
+
 
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
@@ -1166,9 +1406,14 @@ function setEndScreen() {
     ? `<div style="font-size:15px; font-family:'8bit-font-text'; color:#e8c84a; background:#2a1f00; border:1px solid #e8c84a; border-radius:8px; padding:4px 12px; display:inline-block; margin-bottom:8px;">NEW PERSONAL BEST!</div><br>`
     : `<div style="font-size:13px; font-family:'8bit-font-text'; color:#5a5a6a; margin-bottom:6px;">Best: ${getHighScore().toLocaleString()} PP</div>`;
 
+  // Death message based on cause
+  const deathMessage = deathCause === 'overheat' 
+    ? '<div style="font-size:14px; font-family:\'8bit-font-text\'; color:#ff6b6b; margin-bottom:12px;">You blew up!</div>'
+    : '<div style="font-size:14px; font-family:\'8bit-font-text\'; color:#6a3a3a; margin-bottom:12px;">You crashed.</div>';
+
   document.getElementById("endScreen").innerHTML = `
     <div style="font-size:38px; font-family:'8bit-font-text'; color:#e03a3a; margin-bottom:4px;">GAME OVER</div>
-    <div style="font-size:14px; font-family:'8bit-font-text'; color:#6a3a3a; margin-bottom:12px;">You crashed.</div>
+    ${deathMessage}
     ${newRecordBadge}
     <div class="grade-badge" style="color:${gradeColor}; background:${gradeBg}; border-color:${gradeColor};">${grade}</div>
     <div class="tier-label" style="color:${gradeColor};">${tierLabel}</div>
@@ -1187,7 +1432,7 @@ function setEndScreen() {
   `;
 }
 
-function goHome() {
+  function goHome() {
   showDiv('startScreen');
   myGameArea.stop();
   myGamePiece.ammo = null;
@@ -1205,16 +1450,22 @@ function goHome() {
     _aEl.textContent = '';
     _aEl.style.display = 'none';
   }
+  const gaugeEl = document.getElementById('heatGauge');
+  if (gaugeEl) gaugeEl.remove();
   screenShake.active = false;
   screenShake.intensity = 0;
   speedLines = [];
   explosions = [];
+  afterburnerShakeIntensity = 0;
   crashFlash.active = false;
   crashFlash.alpha = 0;
   crashFlash.elapsed = 0;
   crashSlowmo.active = false;
   crashSlowmo.elapsed = 0;
   lastDisplayedScore = 0;
+  shipAfterburnerOffset = 0;
+  afterburnerActive = false;
+  afterburnerSpeedMultiplier = 1;
   myGameArea.context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   hideDiv('endScreen');
   showDiv('menuBackground')
@@ -1226,6 +1477,9 @@ function goHome() {
   stopDynamicMusic();
   const hsEl = document.getElementById('highScoreHUD');
   if (hsEl) hsEl.style.display = 'none';
+  currentHeat = 0;
+  deathCause = 'crash';
+  engineFlames = [];
 }
 
 function updateGameArea(delta = 1) {
@@ -1288,9 +1542,21 @@ function updateGameArea(delta = 1) {
 
   // shake offset
   let shakeX = 0, shakeY = 0;
+  
+  if (afterburnerActive) {
+    afterburnerShakeIntensity += (AFTERBURNER_SHAKE_TARGET - afterburnerShakeIntensity) * AFTERBURNER_SHAKE_FADE_RATE;
+  } else {
+    afterburnerShakeIntensity += (0 - afterburnerShakeIntensity) * AFTERBURNER_SHAKE_FADE_RATE;
+  }
+
+  if (afterburnerShakeIntensity > 0.1) {
+    shakeX += (Math.random() - 0.5) * afterburnerShakeIntensity * 2;
+    shakeY += (Math.random() - 0.5) * afterburnerShakeIntensity * 2;
+  }
+  
   if (screenShake.active) {
-    shakeX = (Math.random() - 0.5) * screenShake.intensity * 2;
-    shakeY = (Math.random() - 0.5) * screenShake.intensity * 2;
+    shakeX += (Math.random() - 0.5) * screenShake.intensity * 2;
+    shakeY += (Math.random() - 0.5) * screenShake.intensity * 2;
     screenShake.elapsed += delta;
     screenShake.intensity = 14 * (1 - screenShake.elapsed / screenShake.duration);
     if (screenShake.elapsed >= screenShake.duration) {
@@ -1298,31 +1564,46 @@ function updateGameArea(delta = 1) {
       screenShake.intensity = 0;
     }
   }
+  
   myGameArea.shakeX = shakeX;
   myGameArea.shakeY = shakeY;
 
   myGameArea.clear();
   const difficulty = getObstacleDifficultyProfile();
   myBackground.speedX = -(difficulty.backgroundSpeed) * delta;
+  
+  const targetMultiplier = afterburnerActive ? 2 : 1;
+  const easeRate = afterburnerActive ? AFTERBURNER_EASE_IN_RATE : AFTERBURNER_EASE_OUT_RATE;
+  afterburnerSpeedMultiplier += (targetMultiplier - afterburnerSpeedMultiplier) * easeRate;
+  
+  afterburnerSpeedMultiplier = Math.max(1, Math.min(2, afterburnerSpeedMultiplier));
+  
   myGameArea.frameNo += 1;
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
 
-  const keys = myGameArea.keys || {};
+    const keys = myGameArea.keys || {};
 
-  if (keys[38] || keys[87]) { // Up Arrow or W
-    myGamePiece.speedY =
-      -(Number(getSelectedShipCookie().at(1))) * 3 * delta;
-  }
+    // Calculate base vertical speed from ship sensitivity
+    let baseSpeedY = 0;
+    
+    if (keys[38] || keys[87]) { // Up Arrow or W
+      baseSpeedY = -(Number(getSelectedShipCookie().at(1))) * 3 * delta;
+    }
 
-  if (keys[40] || keys[83]) { // Down Arrow or S
-    myGamePiece.speedY =
-      Number(getSelectedShipCookie().at(1)) * 3 * delta;
-  }
+    if (keys[40] || keys[83]) { // Down Arrow or S
+      baseSpeedY = Number(getSelectedShipCookie().at(1)) * 3 * delta;
+    }
 
-  if (touchDY !== 0) {
-    myGamePiece.speedY = touchDY * Number(getSelectedShipCookie().at(1)) * 3 * delta;
-  }
+    if (touchDY !== 0) {
+      baseSpeedY = touchDY * Number(getSelectedShipCookie().at(1)) * 3 * delta;
+    }
+
+    if (afterburnerActive) {
+      baseSpeedY *= 2;
+    }
+
+    myGamePiece.speedY = baseSpeedY;
 
   if (myGamePiece.speedY < 0)      myGamePiece.tiltTarget = -0.22;
   else if (myGamePiece.speedY > 0) myGamePiece.tiltTarget =  0.22;
@@ -1390,7 +1671,7 @@ function updateGameArea(delta = 1) {
     : GAME_HEIGHT / 2;
 
   if (everyinterval(600)) {
-    const mag = new component(10, 10, "./images/ammo_v1.png", GAME_WIDTH - random200, randomGap, "n/a", "mag", "n/a");
+    const mag = new component(10, 10, "./images/enviromental_objects/ammo_v1.png", GAME_WIDTH - random200, randomGap, "n/a", "mag", "n/a");
     mag.baseY = randomGap;
     mag.bobPhase = Math.random() * Math.PI * 2;
     myMags.push(mag);
@@ -1401,21 +1682,52 @@ function updateGameArea(delta = 1) {
   updateAndDrawSpeedLines();
 
   for (let oi = 0; oi < myObstacles.length; oi++) {
-    myObstacles[oi].x += -(difficulty.obstacleSpeed) * delta;
+    myObstacles[oi].x += -(difficulty.obstacleSpeed) * delta * afterburnerSpeedMultiplier;
     myObstacles[oi].update();
   }
   for (let bi = 0; bi < myBarriers.length; bi++) {
-    myBarriers[bi].x += -(difficulty.obstacleSpeed) * delta;
+    myBarriers[bi].x += -(difficulty.obstacleSpeed) * delta * afterburnerSpeedMultiplier;
     myBarriers[bi].update();
   }
   for (let mi = 0; mi < myMags.length; mi++) {
-    myMags[mi].x += -(difficulty.obstacleSpeed) * delta;
+    myMags[mi].x += -(difficulty.obstacleSpeed) * delta * afterburnerSpeedMultiplier;
     myMags[mi].y = (myMags[mi].baseY ?? myMags[mi].y) + Math.sin((myGameArea.frameNo * 0.12) + (myMags[mi].bobPhase ?? 0)) * 5;
     myMags[mi].update();
   }
 
   myGamePiece.newPos();
   myGamePiece.update();
+
+  
+  if (afterburnerActive) {
+    if (shipAfterburnerOffset < AFTERBURNER_MAX_OFFSET) {
+      shipAfterburnerOffset = Math.min(AFTERBURNER_MAX_OFFSET, shipAfterburnerOffset + AFTERBURNER_RAPID_SHIFT_SPEED);
+      myGamePiece.x += AFTERBURNER_RAPID_SHIFT_SPEED;
+    }
+    
+    currentHeat = Math.min(MAX_HEAT, currentHeat + HEAT_INCREASE_RATE);
+  } else {
+    if (currentHeat > 0) {
+      currentHeat = Math.max(0, currentHeat - HEAT_DECREASE_RATE);
+    }
+    
+    if (shipAfterburnerOffset > 0) {
+      shipAfterburnerOffset = Math.max(0, shipAfterburnerOffset - AFTERBURNER_RETURN_SPEED);
+      myGamePiece.x -= AFTERBURNER_RETURN_SPEED;
+    }
+  }
+  
+  myGamePiece.update();
+  
+  // Check if player overheated-- bail out of this frame immediately
+  if (checkOverheat()) return;
+  
+  // Update heat gauge display
+  updateHeatGauge();
+  
+  if (afterburnerActive) {
+    updateAndDrawEngineFlames();
+  }
 
   const currentScore = myGameArea.frameNo / 4 * getSelectedShipCookie().at(7);
   updateHUDs(currentScore);
@@ -1445,8 +1757,8 @@ function updateGameArea(delta = 1) {
   for (let zi = myMags.length - 1; zi >= 0; zi--) {
     if (myGamePiece.crashWith(myMags[zi])) {
       myMags.splice(zi, 1);
-      if (myGamePiece.ammo < 8) {
-        let ammoToAdd = Math.min(5, 8 - myGamePiece.ammo);
+      if (myGamePiece.ammo < getMaxAmmo()) {
+        let ammoToAdd = Math.min(4, getMaxAmmo() - myGamePiece.ammo);
         myGamePiece.ammo += ammoToAdd;
       }
       updateHUDs();
@@ -1456,7 +1768,8 @@ function updateGameArea(delta = 1) {
 
   for (let bi = 0; bi < myBullets.length; bi++) {
     const spd = myBullets[bi].baseBulletSpeedX !== undefined ? myBullets[bi].baseBulletSpeedX : 15;
-    myBullets[bi].x += spd * delta;
+    // Bullets also travel faster during afterburner with same easing
+    myBullets[bi].x += spd * delta * afterburnerSpeedMultiplier;
     myBullets[bi].y += (myBullets[bi].baseBulletSpeedY || 0) * delta;
     myBullets[bi].update();
   }
@@ -1535,15 +1848,22 @@ function everyinterval(n) {
   return curr > prev;
 }
 
-// ── SHOOTING ──
-document.addEventListener("keydown", keyDownHandler);
-document.addEventListener("keyup",   keyUpHandler);
+  // ── SHOOTING ──
+  document.addEventListener("keydown", keyDownHandler);
+  document.addEventListener("keyup",   keyUpHandler);
 
-var spaceDown   = false;
-var lastShotTime = 0;
-var firstShot    = true;
+  var spaceDown   = false;
+  var lastShotTime = 0;
+  var firstShot    = true;
 
-function keyDownHandler(e) {
+  function getMaxAmmo() {
+    const selectedShipName = getSelectedShipCookie().at(11);
+    const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+    const doubleGun = getShipUpgradeState(selectedShipKey).doubleGun;
+    return doubleGun ? 16 : 8;
+  }
+
+  function keyDownHandler(e) {
   if (e.key == " " && spaceDown == false && Date.now() - lastShotTime >= 1000) {
     spaceDown = true;
     fireBullet();
@@ -1563,20 +1883,60 @@ function fireBullet() {
 
   if (firstShot == true) {
     firstShot = false;
-    myGamePiece.ammo = 8;
+    myGamePiece.ammo = getMaxAmmo();
   }
 
-  if (myGamePiece.ammo >= 1) {
-    updateHUDs();
-    lastShotTime = Date.now();
-    shootingSound.stop();
-    shootingSound.play();
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+  const doubleGun = getShipUpgradeState(selectedShipKey).doubleGun;
+
+if (myGamePiece.ammo >= (doubleGun ? 2 : 1)) {
+  updateHUDs();
+  lastShotTime = Date.now();
+  shootingSound.stop();
+  shootingSound.play();
+
+  const gunCode = getSelectedShipCookie().at(2);
+
+    if (doubleGun) {
+      const facingAngle = myGamePiece.facingAngle ?? (myGamePiece.tiltAngle || 0);
+
+      const pivotX = myGamePiece.x + myGamePiece.width - 15;
+      const pivotY = myGamePiece.y + Number(myGamePiece.gunPosY);
+
+      const sideOffset = 40;
+      const aimDistance = getShipUpgradeState(selectedShipKey).aimDistance;
+
+      const localOffsets = [
+        { x: 0, y: -sideOffset },   
+        { x: 0, y:  sideOffset }   
+      ];
+
+      const cos = Math.cos(facingAngle);
+      const sin = Math.sin(facingAngle);
+
+      const bullets = localOffsets.map(offset => {
+        const originX = pivotX + offset.x * cos - offset.y * sin;
+        const originY = pivotY + offset.x * sin + offset.y * cos;
+        const aimAngle = Math.atan2(-offset.y, aimDistance);
+        const finalAngle = facingAngle + aimAngle;
+        const bullet = new component(30, 7, "yellow", originX, originY, "bullets", "n/a", "n/a");
+        bullet.baseBulletSpeedX = 15 * Math.cos(finalAngle);
+        bullet.baseBulletSpeedY = 15 * Math.sin(finalAngle);
+        bullet.angle = finalAngle;
+        return bullet;
+      });
+
+      myBullets.push(...bullets);
+      myGamePiece.ammo -= 2;
+      updateHUDs();
+      console.log("Fired double bullets from both guns.");
+      return;
+    }
 
     const tilt = myGamePiece.tiltAngle || 0;
     const bulletSpeedX = 15 * Math.cos(tilt);
     const bulletSpeedY = 15 * Math.sin(tilt);
-
-    const gunCode = getSelectedShipCookie().at(2);
 
     if (gunCode.includes('1')) {
       const b = new component(30, 7, "yellow", myGamePiece.x + 110, (myGamePiece.y + Number(myGamePiece.gunPosY)), "bullets", "n/a", "n/a");
@@ -1602,6 +1962,169 @@ function fireBullet() {
       updateHUDs();
     }
   }
+}
+
+// ── HEAT GAUGE HTML ──
+function createHeatGauge() {
+  if (document.getElementById('heatGauge')) return;
+  
+  const gaugeHTML = `
+    <div id="heatGauge" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 400px; z-index: 150; pointer-events: none;">
+      <div style="font-family: '8bit-font-text'; font-size: 14px; color: #c8c8d0; text-align: center; margin-bottom: 6px; text-shadow: 1px 1px #1a0808;">THERMAL LEVEL</div>
+      <div style="background: #1a0808; border: 2px solid #4a1a1a; border-radius: 6px; height: 18px; overflow: hidden;">
+        <div id="heatGaugeFill" style="height: 100%; width: 0%; background: #e8c84a; transition: width 0.05s ease; box-shadow: 0 0 8px rgba(232, 200, 74, 0.5);"></div>
+      </div>
+      <div id="heatGaugeText" style="font-family: '8bit-font-text'; font-size: 12px; color: #e8c84a; text-align: right; margin-top: 4px; text-shadow: 1px 1px #1a0808;">0%</div>
+    </div>
+  `;
+  
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = gaugeHTML;
+  document.body.appendChild(tempDiv.firstElementChild);
+}
+
+// ── FLAME PARTICLE FUNCTIONS ──
+function spawnEngineFlame(ox, oy, offsetX, offsetY) {
+  // Pick random flame image (flame1.png to flame8.png)
+  const flameNum = Math.floor(Math.random() * 8) + 1;
+  const flameSrc = `./images/flames/flame${flameNum}.png`;
+  
+  const sizeVariation = 0.7 + Math.random() * 0.6; 
+  
+  engineFlames.push({
+    x: ox + offsetX,
+    y: oy + offsetY,
+    src: flameSrc,
+    size: FLAME_BASE_SIZE * sizeVariation,
+    life: FLAME_LIFETIME,
+    maxLife: FLAME_LIFETIME,
+    opacity: 1.0,
+    scale: 1 + Math.random() * 0.3
+  });
+}
+
+function updateAndDrawEngineFlames() {
+  const ctx = myGameArea.context;
+  const sx = myGameArea.shakeX || 0;
+  const sy = myGameArea.shakeY || 0;
+  
+  if (!myGamePiece) return;
+  
+  const shipX = myGamePiece.x;
+  const shipY = myGamePiece.y;
+  const shipW = myGamePiece.width + 15;
+  const shipH = myGamePiece.height + 15;
+  
+  // Top-left engine 
+  const topLeftX = shipX + shipW * 0.15 + 15;
+  const topLeftY = shipY + shipH * 0.15;
+  
+  // Bottom-left engine 
+  const botLeftX = shipX + shipW * 0.15 + 15;
+  const botLeftY = shipY + shipH * 0.85;
+  
+
+  if (afterburnerActive && flameEmissionTimer++ >= FLAME_EMIT_INTERVAL) {
+    flameEmissionTimer = 0;
+    
+
+    spawnEngineFlame(topLeftX, topLeftY, -shipW * 0.2, -shipH * 0.005);
+    spawnEngineFlame(botLeftX, botLeftY, -shipW * 0.2, shipH * 0.01);
+  }
+
+  for (let i = engineFlames.length - 1; i >= 0; i--) {
+    const f = engineFlames[i];
+    f.life--;
+    f.opacity = f.life / f.maxLife;
+  
+    const currentScale = f.scale * f.opacity;
+    
+    if (f.life <= 0) {
+      engineFlames.splice(i, 1);
+      continue;
+    }
+    
+    const img = new Image();
+    img.src = f.src;
+    
+    ctx.save();
+    ctx.globalAlpha = f.opacity;
+    ctx.translate(f.x + sx, f.y + sy);
+    ctx.rotate(-Math.PI / 2);
+    ctx.rotate((Math.random() - 0.5) * 0.2); // Slight jitter
+    ctx.scale(currentScale, currentScale);
+    ctx.drawImage(img, -f.size / 2, -f.size / 2, f.size, f.size);
+    ctx.restore();
+  }
+}
+
+// ── AFTERBURNER STATE ──
+var afterburnerActive = false;
+var shipAfterburnerOffset = 0;
+const AFTERBURNER_MAX_OFFSET = 150;
+const AFTERBURNER_RAPID_SHIFT_SPEED = 8;
+const AFTERBURNER_RETURN_SPEED = 2;
+
+// Afterburner speed easing
+var afterburnerSpeedMultiplier = 1; 
+const AFTERBURNER_EASE_IN_RATE = 0.10;
+const AFTERBURNER_EASE_OUT_RATE = 0.12; 
+
+// Afterburner screen shake
+var afterburnerShakeIntensity = 0;
+const AFTERBURNER_SHAKE_TARGET = 3; 
+const AFTERBURNER_SHAKE_FADE_RATE = 0.15; 
+
+// Afterburner heat system
+var currentHeat = 0; 
+const MAX_HEAT = 100; // 
+const HEAT_INCREASE_RATE = 0.7; 
+const HEAT_DECREASE_RATE = 0.7; 
+const OVERHEAT_WARNING_THRESHOLD = 70; 
+
+
+var deathCause = 'crash'; // crash or overheat
+
+// Flame particle system
+var engineFlames = [];
+var flameEmissionTimer = 0;
+const FLAME_EMIT_INTERVAL = 6; 
+const FLAME_LIFETIME = 15; 
+const FLAME_BASE_SIZE = 30;
+
+
+// ── KEY HANDLERS FOR AFTERBURNER ──
+document.addEventListener("keydown", function afterburnerKeyDown(e) {
+  if (e.key === 'Shift' && myGamePiece) {
+    const selectedShipName = getSelectedShipCookie().at(11);
+    const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+    const upgrade = getShipUpgradeState(selectedShipKey);
+    
+    if (upgrade.afterburner) {
+      afterburnerActive = true;
+      if (shootingSound) shootingSound.stop();
+    }
+  }
+});
+
+document.addEventListener("keyup", function afterburnerKeyUp(e) {
+  if (e.key === 'Shift') {
+    afterburnerActive = false;
+  }
+});
+
+// ── OVERHEAT DETECTION AND EXPLOSION ──
+function checkOverheat() {
+  if (currentHeat >= MAX_HEAT) {
+    afterburnerActive = false;
+    afterburnerSpeedMultiplier = 1;
+    shipAfterburnerOffset = 0;
+    myGamePiece.crashed = true;
+    deathCause = 'overheat';
+    myGamePiece.onCrash();
+    return true; // Overheated
+  }
+  return false;
 }
 
 // ── AUDIO ──
@@ -1758,12 +2281,18 @@ document.addEventListener("visibilitychange", function() {
 let gamePaused = false;
 let orientationPausedGame = false;
 
-function pauseGame() {
+  function pauseGame() {
   if (!myGameArea.rafId) return;
   gamePaused = true;
   cancelAnimationFrame(myGameArea.rafId);
   myGameArea.rafId = null;
   myGameArea.lastTime = 0;
+  shipAfterburnerOffset = 0;
+  afterburnerActive = false;
+  afterburnerSpeedMultiplier = 1;
+  afterburnerShakeIntensity = 0;
+  engineFlames = [];
+  flameEmissionTimer = 0;
   showDiv('pauseScreen');
 }
 

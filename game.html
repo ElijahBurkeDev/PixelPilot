@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8">
   <title>Pixel Pilot</title>
-  <link rel="icon" type="image/x-icon" href="./images/ppfavicon.ico">
+  <link rel="icon" type="image/x-icon" href="./images/misc/ppfavicon.ico">
 </head>
 
 <body
@@ -655,6 +655,42 @@
       font-size: 30px;
     }
 
+    .upgradePanel {
+      position: absolute;
+      top: 100px;
+      right: 50px;
+      bottom: 92px;
+      width: 330px;
+      padding: 18px;
+      margin: auto;
+      overflow-y: auto;
+      color: #c8c8d0;
+      background: #0f0f14;
+      border: solid #8b1a1a;
+      font-family: '8bit-font-text';
+      scrollbar-width: thin;
+      scrollbar-color: #8b1a1a #1a0808;
+    }
+
+    .upgradePanel h2 {
+      margin: 0 0 12px;
+      color: #e8c84a;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .upgradePanel h3 {
+      margin: 16px 0 6px;
+      color: #e03a3a;
+      font-size: 16px;
+    }
+
+    .upgradePanel p { font-size: 13px; margin: 8px 0; }
+    .upgradePanel input[type="range"] { width: 100%; }
+    .upgradePanel button { font-family: '8bit-font-text'; margin-top: 8px; }
+    .upgradePanel input[type=range] { flex: 2; accent-color: #e03a3a;}
+    .upgradeValue { color: #e8c84a; float: right; }
+
 /*
 
     .spaceshipPreview {
@@ -1082,7 +1118,7 @@
         position: absolute;
         top: 82px;
         left: clamp(16px, 3vw, 50px);
-        right: clamp(16px, 3vw, 50px);
+        right: calc(clamp(16px, 3vw, 50px) + min(330px, 27vw) + 16px);
         bottom: calc(var(--selector-height) + var(--card-bottom-gap));
         display: grid;
         grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
@@ -1111,6 +1147,13 @@
       .spaceshipSelector img {
         width: clamp(100px, 16vw, 215px);
         height: auto;
+      }
+
+      .upgradePanel {
+        top: 82px;
+        right: clamp(16px, 3vw, 50px);
+        bottom: calc(var(--selector-height) + var(--card-bottom-gap));
+        width: min(280px, 27vw);
       }
 
       @media (max-width: 500px) {
@@ -1187,6 +1230,15 @@
           overflow-y: auto;
         }
 
+        .upgradePanel {
+          position: static;
+          width: 100%;
+          height: auto;
+          max-height: 190px;
+          padding: 10px;
+          overflow-y: auto;
+        }
+
         .shipInfoContainer {
           top: 62px;
           left: 12px;
@@ -1250,7 +1302,7 @@
         .shipInfoContainer {
           top: 52px;
           left: 16px;
-          right: 16px;
+          right: 310px;
           grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
           gap: 8px;
         }
@@ -1321,7 +1373,7 @@
     <p class="splashText" id="splashText"></p>
 
     <button class="button button1" onclick="startGame() || hideDiv('startScreen') || hideDiv('menuBackground')">START GAME</button>
-    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || showShip('classic') || setScorebar()">HANGAR</button>
+    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || showShip('classic') || setScorebar() || updateShipNavImages()">HANGAR</button>
     <button class="button button2" onclick="hideDiv('startScreen') || showDiv('howPlay') || showDiv('panelBackdrop')">HOW TO PLAY</button>
     <button class="button button3" onclick="hideDiv('startScreen') || showDiv('changelog') || showDiv('panelBackdrop')">CHANGELOG</button>
     <button class="button button4" onclick="hideDiv('startScreen') || showDiv('credits') || showDiv('panelBackdrop')">CREDITS</button>
@@ -1385,8 +1437,8 @@
 
   <div class="marquee-container" id="menuBackground">
     <div class="marquee-track">
-      <img src="./images/Pixel_Space.png" alt="Seamless Loop" class="marquee-image">
-      <img src="./images/Pixel_Space.png" alt="" class="marquee-image" aria-hidden="true">
+      <img src="./images/backgrounds/standard_background.png" alt="Seamless Loop" class="marquee-image">
+      <img src="./images/backgrounds/standard_background.png" alt="" class="marquee-image" aria-hidden="true">
     </div>
   </div>
 
@@ -1396,7 +1448,7 @@
   <!-- HOW TO PLAY -->
   <div class="howPlay" id="howPlay">
     <p style="font-size: 60px; font-family: '8bit-font-text'; color: #e8c84a;">HOW TO PLAY</p>
-    <p style="font-size: 20px; font-family: '8bit-font-text'">Welcome to Pixel Pilot! Weave through obstacles using <b>UP/DOWN</b> or <b>W/S</b> keys. On mobile, use the on-screen joystick and FIRE button. The further you go, the more Pixel Pieces you earn — spend them in the hangar on new ships! Press <b>SPACE</b> to shoot orange barriers out of the way. Good luck, pilot!</p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'">Welcome to Pixel Pilot! Weave through obstacles using <b>UP/DOWN</b> or <b>W/S</b> keys. Pressing <b>ESC</b> or switching tabs will pause the game. On mobile, use the on-screen joystick and FIRE button. The further you go, the more Pixel Pieces you earn — spend them in the hangar on new ships! Press <b>SPACE</b> to shoot orange barriers out of the way. Good luck, pilot!</p>
     <br>
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('howPlay') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
@@ -1471,7 +1523,7 @@
 
     <br>
 
-    <p class="changelog-update"><b>Update III.1: Minor Bug Fixes and Improvements</b></p>
+    <p class="changelog-update"><b>Update III.1: Minor Bug Fixes and Improvements (9/22/26)</b></p>
     <p class="changelog-section"><b>Gameplay Changes</b></p>
     <p class="changelog-entry">-Obstacle spawning logic improved. Obstacle spawning will be more random but consitent with the difficulty level.</p>
     <p class="changelog-entry">-Added new obstacles that are diagnol. They appear occasionally.</p>
@@ -1482,6 +1534,18 @@
     <p class="changelog-section"><b>Other Changes</b></p>
     <p class="changelog-entry">-Some miscellanous code refactoring and cleanup.</p>
     <p class="changelog-entry">-In-game music is more finely tuned to the gameplay.</p>
+
+    <br>
+
+    <p class="changelog-update"><b>Update IV: Upgrades! (In Progress)</b></p>
+    <p class="changelog-section"><b>Gameplay Changes</b></p>
+    <p class="changelog-entry">-The double-gun upgrade for the CLASSIC and the Pixel Piece Prospector is now available! Buy this upgrade and now you can shoot two bullets at once. Don't worry, though, AstroPoppers have 8 round magazines regardless of how many there are, so you'll still have 8 shots.</p>
+    <p class="changelog-entry">-The afterburner upgrade is now available for both the CLASSIC and the Pixel Piece Prospector. After you've purchased this, you can hold down <b>SHIFT</b> to accelerate. Be careful though-- you don't want to overheat!</p>
+    <p class="changelog-entry">-Ammo packs now give 4 rounds instead of 5.</p>
+    <p class="changelog-section"><b>Bug Fixes</b></p>
+    <p class="changelog-entry">-Fixed a typo on the hanger-- oops!</p>
+    <p class="changelog-section"><b>Other Changes</b></p>
+    <p class="changelog-entry">-Some miscellanous code refactoring and cleanup.</p>
 
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('changelog') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
@@ -1552,17 +1616,21 @@
       <div class="spaceshipPreview" id="spaceshipPreview"></div>
     </div>
 
+    <aside class="upgradePanel" id="upgradePanel"></aside>
+     
+    
     <div class="spaceshipSelector" id="spaceshipSelector">
-      <a onclick="showShip('classic')">
-        <img class="SpaceshipNav" src="./images/classic_spaceship_guns_removed_thrust.png" width="215" height="192">
-      </a>
-      <a onclick="showShip('pixpro')">
-        <img class="SpaceshipNav" src="./images/prospector_spaceship_guns_removed_thrust.png" width="215" height="192">
-      </a>
-    </div>
+        <a onclick="showShip('classic')">
+          <img id="nav-img-classic" class="SpaceshipNav" src="./images/spaceships/classic/classic.png" width="215" height="192">
+        </a>
+        <a onclick="showShip('pixpro')">
+          <img id="nav-img-pixpro" class="SpaceshipNav" src="./images/spaceships/pixpro/pixpro.png" width="215" height="192">
+        </a>
+      </div>
 
-  
   </div>
+
+
 
   <script src="./music.js"></script>
   <script src="./hitboxes/classic.js"></script>
