@@ -73,7 +73,7 @@
     }
 
     /* ── HANGAR BAR BACK BUTTON ── */
-    .backbuttonhangerbar {
+    .backbuttonhangarbar {
       display: inline;
       color: #e03a3a;
       text-align: center;
@@ -85,7 +85,7 @@
       border: 1px solid #8b1a1a;
     }
 
-    .backbuttonhangerbar:hover {
+    .backbuttonhangarbar:hover {
       cursor: pointer;
       color: #ff6b6b;
       background-color: #3a0d0d;
@@ -560,7 +560,7 @@
     }
 
     /* ── HANGAR ── */
-    .hanger {
+    .hangar {
       display: none;
       width: 100%;
       height: 100%;
@@ -571,7 +571,7 @@
       left: 0px;
     }
 
-    .hangerBar {
+    .hangarBar {
       display: flex;
       align-items: center;
       overflow: hidden;
@@ -580,7 +580,7 @@
       border-color: #8b1a1a;
     }
 
-    .hangerBar a {
+    .hangarBar a {
       color: #e03a3a;
       text-align: center;
       padding: 14px 16px;
@@ -588,7 +588,7 @@
       font-size: 17px;
     }
 
-    .hangerBar > span {
+    .hangarBar > span {
       float: none !important;
       margin-left: auto;
       padding-right: clamp(12px, 4vw, 70px) !important;
@@ -1054,7 +1054,7 @@
         font-size: clamp(20px, 4vw, 40px);
       }
 
-      .hanger {
+      .hangar {
         --selector-height: clamp(200px, 28vh, 300px);
         --card-bottom-gap: clamp(32px, 6vh, 80px);
         position: fixed;
@@ -1065,7 +1065,7 @@
         box-sizing: border-box;
       }
 
-      .hangerBar {
+      .hangarBar {
         position: absolute;
         top: 0;
         left: 0;
@@ -1157,7 +1157,7 @@
       }
 
       @media (max-width: 500px) {
-        .hanger {
+        .hangar {
           --selector-height: 120px;
         }
 
@@ -1198,7 +1198,7 @@
           font-size: clamp(26px, 8vw, 42px) !important;
         }
 
-        .hangerBar a {
+        .hangarBar a {
           padding: 10px 12px;
           font-size: clamp(13px, 3.5vw, 17px);
         }
@@ -1289,12 +1289,12 @@
           font-size: clamp(16px, 3.5vh, 24px);
         }
 
-        .hanger {
+        .hangar {
           --selector-height: 96px;
           --card-bottom-gap: 6px;
         }
 
-        .hangerBar a {
+        .hangarBar a {
           padding: 8px 12px;
           font-size: 14px;
         }
@@ -1373,7 +1373,7 @@
     <p class="splashText" id="splashText"></p>
 
     <button class="button button1" onclick="startGame() || hideDiv('startScreen') || hideDiv('menuBackground')">START GAME</button>
-    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hanger') || showShip('classic') || setScorebar() || updateShipNavImages()">HANGAR</button>
+    <button class="button button6" onclick="hideDiv('startScreen') || showDiv('hangar') || showShip('classic') || setScorebar() || updateShipNavImages()">HANGAR</button>
     <button class="button button2" onclick="hideDiv('startScreen') || showDiv('howPlay') || showDiv('panelBackdrop')">HOW TO PLAY</button>
     <button class="button button3" onclick="hideDiv('startScreen') || showDiv('changelog') || showDiv('panelBackdrop')">CHANGELOG</button>
     <button class="button button4" onclick="hideDiv('startScreen') || showDiv('credits') || showDiv('panelBackdrop')">CREDITS</button>
@@ -1525,7 +1525,7 @@
 
     <p class="changelog-update"><b>Update III.1: Minor Bug Fixes and Improvements (9/22/26)</b></p>
     <p class="changelog-section"><b>Gameplay Changes</b></p>
-    <p class="changelog-entry">-Obstacle spawning logic improved. Obstacle spawning will be more random but consitent with the difficulty level.</p>
+    <p class="changelog-entry">-Obstacle spawning logic improved. Obstacle spawning will be more random but consistent with the difficulty level.</p>
     <p class="changelog-entry">-Added new obstacles that are diagnol. They appear occasionally.</p>
     <p class="changelog-entry">-Ammo packs bob up and down in the game for increased visibility.</p>
     <p class="changelog-entry">-Improved collision detection for the spaceship. Previously, the hitboxes would stretch and become larger than the actual ship when turning.</p>
@@ -1533,19 +1533,24 @@
     <p class="changelog-entry">-Fixed bug where bullets would remain horizontal but move towards the target. Now, bullets are angled in the direction that they were shot.</p>
     <p class="changelog-section"><b>Other Changes</b></p>
     <p class="changelog-entry">-Some miscellanous code refactoring and cleanup.</p>
-    <p class="changelog-entry">-In-game music is more finely tuned to the gameplay.</p>
+    <p class="changelog-entry">-In-game music is more tuned to the gameplay.</p>
 
     <br>
 
     <p class="changelog-update"><b>Update IV: Upgrades! (In Progress)</b></p>
     <p class="changelog-section"><b>Gameplay Changes</b></p>
     <p class="changelog-entry">-The double-gun upgrade for the CLASSIC and the Pixel Piece Prospector is now available! Buy this upgrade and now you can shoot two bullets at once. Don't worry, though, AstroPoppers have 8 round magazines regardless of how many there are, so you'll still have 8 shots.</p>
-    <p class="changelog-entry">-The afterburner upgrade is now available for both the CLASSIC and the Pixel Piece Prospector. After you've purchased this, you can hold down <b>SHIFT</b> to accelerate. Be careful though-- you don't want to overheat!</p>
+    <p class="changelog-entry">-The afterburner upgrade is now available for both the CLASSIC and the Pixel Piece Prospector. After you've purchased this, you can hold down <b>D</b> to accelerate. Be careful though-- you don't want to overheat!</p>
+    <p class="changelog-entry">-Changed score calculation from frame-based to time-based. (Subject to change)</p>
     <p class="changelog-entry">-Ammo packs now give 4 rounds instead of 5.</p>
     <p class="changelog-section"><b>Bug Fixes</b></p>
-    <p class="changelog-entry">-Fixed a typo on the hanger-- oops!</p>
+    <p class="changelog-entry">-Fixed hangar related typos-- oops!</p>
     <p class="changelog-section"><b>Other Changes</b></p>
+    <p class="changelog-entry">-Added upgrade panel to hangar.</p>
+    <p class="changelog-entry">-Updated spaceship descriptions and added guns as seperate entities.</p>
     <p class="changelog-entry">-Some miscellanous code refactoring and cleanup.</p>
+    <p class="changelog-entry">-Switched to new and less abrasive game over sound. Sorry!</p>
+    <p class="changelog-entry">-Added a lot more game over quips to keep things fresh and to annoy you even more.</p>
 
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('changelog') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
@@ -1558,7 +1563,7 @@
     <br>
     <p style="font-size: 20px; font-family: '8bit-font-text'">Explosion effect by <a href="https://pixabay.com/users/u_b32baquv5u-50250111/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340460" style="color: #4a7a9b;">u_b32baquv5u</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340460" style="color: #4a7a9b;">Pixabay</a></p>
     <br>
-    <p style="font-size: 20px; font-family: '8bit-font-text'"> Game over sound effect by <a href="https://pixabay.com/users/lumora_studios-39090352/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=319170" style="color: #4a7a9b;">Lumora Studios</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=319170" style="color: #4a7a9b;">Pixabay</a></p>
+    <p style="font-size: 20px; font-family: '8bit-font-text'"> Game over sound effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45659" style="color: #4a7a9b;">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45659" style="color: #4a7a9b;">Pixabay</a></p>
     <br>
     <p style="font-size: 20px; font-family: '8bit-font-text'">W3 Schools for pieces of code. You can still see plenty of vestigial code/variable names from <a href="https://www.w3schools.com/graphics/game_intro.asp" style="color: #4a7a9b;">here</a>.</p>
     <br>
@@ -1568,6 +1573,8 @@
     <br>
     <p style="font-size: 20px; font-family: '8bit-font-text'">Other miscellaneous people who have given help and feedback. You know who you are. o7</p>
     <br>
+     <p style="font-size: 20px; font-family: '8bit-font-text'">Your name could be here! Interested in helping with the development of Pixel Pilot? Send me a message through the feedback widget.</p>
+     <br>
     <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('credits') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
   </div>
 
@@ -1603,12 +1610,12 @@
   <div id="touchFireBtn">FIRE</div>
   <div id="portraitGameBlocker">Rotate your phone horizontally<br>to play Pixel Pilot.</div>
 
-  <div class="hanger" id="hanger" style="background-image: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0)); z-index: 100;">
+  <div class="hangar" id="hangar" style="background-image: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0)); z-index: 100;">
 
     <div class="purchaseDialog" id="purchaseDialog"></div>
     <div class="overlay" id="overlay"></div>
 
-    <div class="hangerBar" id="hangerBar"></div>
+    <div class="hangarBar" id="hangarBar"></div>
 
     <div class="shipInfoContainer">
       <div class="spaceshipStats" id="spaceshipStats"></div>
@@ -1635,7 +1642,10 @@
   <script src="./music.js"></script>
   <script src="./hitboxes/classic.js"></script>
   <script src="./hitboxes/pixpro.js"></script>
+  <script src="./splash-strings.js"></script>
+  <script src="./end-screen-quips.js"></script>
   <script src="./script.js"></script>
+  <script src="./controls.js"></script>
 
 
 </body>

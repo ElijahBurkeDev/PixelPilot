@@ -31,17 +31,13 @@ fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/de
       const prospectorHitboxScript = document.createElement('script');
       prospectorHitboxScript.src = `./hitboxes/pixpro.js?v=${Date.now()}`;
       prospectorHitboxScript.onload = () => {
-        const script = document.createElement('script');
-        script.src = `./script.js?v=${Date.now()}`;
-        script.onload = () => {
-          console.log('Remote script loaded successfully');
+        loadGameScripts(() => {
+          console.log('Remote game and content scripts loaded successfully');
           queryShipCookie() || showShip('classic');
-        };
-        script.onerror = () => {
-          console.error('Failed to load remote script, trying local fallback...');
+        }, () => {
+          console.error('Failed to load remote game content, trying local fallback...');
           loadLocalFallback();
-        };
-        document.body.appendChild(script);
+        });
       };
       prospectorHitboxScript.onerror = () => {
         console.error('Failed to load remote Prospector hitboxes, trying local fallback...');
@@ -65,6 +61,30 @@ fetch('https://raw.githubusercontent.com/ElijahBurkeDev/PixelPilot/refs/heads/de
     console.warn('Remote fetch failed, reverting to local files:', error);
     loadLocalFallback();
   });
+
+function loadGameScripts(onSuccess, onError) {
+  const scripts = [
+    './splash-strings.js',
+    './end-screen-quips.js',
+    './script.js',
+    './controls.js',
+  ];
+
+  function loadNext(index) {
+    if (index === scripts.length) {
+      onSuccess();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `${scripts[index]}?v=${Date.now()}`;
+    script.onload = () => loadNext(index + 1);
+    script.onerror = onError;
+    document.body.appendChild(script);
+  }
+
+  loadNext(0);
+}
 
 function loadLocalFallback() {
 
@@ -100,16 +120,12 @@ function loadLocalFallback() {
         const prospectorHitboxScript = document.createElement('script');
         prospectorHitboxScript.src = `./hitboxes/pixpro.js?v=${Date.now()}`;
         prospectorHitboxScript.onload = () => {
-          const script = document.createElement('script');
-          script.src = `./script.js?v=${Date.now()}`;
-          script.onload = () => {
-            console.log('Local fallback loaded successfully');
+          loadGameScripts(() => {
+            console.log('Local fallback game and content scripts loaded successfully');
             queryShipCookie() || showShip('classic');
-          };
-          script.onerror = () => {
-            console.error('Local script also failed!');
-          };
-          document.body.appendChild(script);
+          }, () => {
+            console.error('Local game content scripts also failed!');
+          });
         };
         prospectorHitboxScript.onerror = () => {
           console.error('Local Prospector hitboxes also failed!');

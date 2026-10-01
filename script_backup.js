@@ -6,7 +6,7 @@ window.Userback = window.Userback || {};
     var s = d.createElement('script');s.async = true;s.src = 'https://static.userback.io/widget/v1.js';(d.head || d.body).appendChild(s);
   })(document);
 
-// Ship definitions, upgrades, and hangar presentation.
+
 const SPACESHIPS = {
   classic: {
     name: 'CLASSIC',
@@ -179,25 +179,6 @@ function updateUpgradePanel() {
     <input type="range" min="200" max="2000" step="25" value="${upgrade.aimDistance}" ${upgrade.doubleGun && owned ? '' : 'disabled'} oninput="updateShipAimDistance('${viewedShipKey}', this.value)">`;
 }
 
-function buildStatBars(speed, maneuver, multiplier, hullSize) {
-  function bar(label, value, max, color) {
-    const pct = Math.min(100, Math.round((value / max) * 100));
-    return `<div class="stat-bar-wrap">
-      <span class="stat-bar-label">${label}</span>
-      <div class="stat-bar-track" tabindex="0" aria-label="${label.replace(/<[^>]*>/g, '')}: ${value}">
-        <div class="stat-bar-fill" style="width:${pct}%; background:${color};"></div>
-      </div>
-      <span class="stat-bar-value" role="tooltip">${value}</span>
-    </div>`;
-  }
-  return `<div style="margin: 12px 0 4px 0;">
-    ${bar('<b>Speed</b>', speed, 50, '#e03a3a')}
-    ${bar('<b>Maneuverability</b>', maneuver, 10, '#4a9bdc')}
-    ${bar('<b>Multiplier</b>', multiplier, 10, '#e8c84a')}
-    ${bar('<b>Hull Size</b>', hullSize, 10, '#9b6ad6')}
-  </div>`;
-}
-
 function getShipStatsMarkup(ship, shipKey) {
   const stats = ship.stats;
   const gun = GUNS[ship.guns];
@@ -270,8 +251,133 @@ function showShip(shipKey) {
 }
 
 
+//----------------------------------------------------------------------
+// STAT BARS BUILDER 
+function buildStatBars(speed, maneuver, multiplier, hullSize) {
+  function bar(label, value, max, color) {
+    const pct = Math.min(100, Math.round((value / max) * 100));
+    return `<div class="stat-bar-wrap">
+      <span class="stat-bar-label">${label}</span>
+      <div class="stat-bar-track" tabindex="0" aria-label="${label.replace(/<[^>]*>/g, '')}: ${value}">
+        <div class="stat-bar-fill" style="width:${pct}%; background:${color};"></div>
+      </div>
+      <span class="stat-bar-value" role="tooltip">${value}</span>
+    </div>`;
+  }
+  return `<div style="margin: 12px 0 4px 0;">
+    ${bar('<b>Speed</b>', speed, 50, '#e03a3a')}
+    ${bar('<b>Maneuverability</b>', maneuver, 10, '#4a9bdc')}
+    ${bar('<b>Multiplier</b>', multiplier, 10, '#e8c84a')}
+    ${bar('<b>Hull Size</b>', hullSize, 10, '#9b6ad6')}
+  </div>`;
+}
+
+//----------------------------------------------------------------------
+var splashStrings = [
+  "Holy hamsters!",
+  "Gluten-free water!",
+  "Tip your waiter!",
+  "Gondor calls for aid!",
+  "Made in the USA!",
+  "Give me a break!",
+  "Shout!",
+  "Vegan-free!",
+  "Totally accurate!",
+  "Heavier than a kilogram of feathers!",
+  "PEMDAS!",
+  "Made for VSA!",
+  "All I'm asking for is total perfection!",
+  "Déjà vu!",
+  "May contain bugs!",
+  "Smash that subscribe button!",
+  "Don't forget to breathe!",
+  "Don't ask your doctor!",
+  "Read the instructions before opening!",
+  "Привет!",
+  "Eat more cheeseballs!",
+  "Don't forget your homework!",
+  "Panic is not advised, but it is recommended!",
+  "Nobody asked for your opinion!",
+  "Try the calamari!",
+  "Oh, it's you again!",
+  "I'm ready!",
+  "Pay as little taxes as legally permissible!",
+  "Don't be naïve!",
+  "What the fridge!",
+  "May cause intense anxiety!",
+  "Pineapple on pizza is good!",
+  "Wow, nice shoes!",
+  "Watch out for the mafia!",
+  "That's kinda dicey!",
+  "Это всего лишь несколько слов!",
+  "Indie!",
+  "Don't forget to lock up the chinchillas!",
+  "Another one bites the dust!",
+  "Check under your bed for Chuck Norris!",
+  "Carry on!",
+  "Don't let a drunk chicken stomp on your crops!",
+  "Houston, we have a major problem!",
+  "It gets worse, trust me!",
+  "So many pixels!",
+  "Oh come on, Patrick!",
+  "Don't be scared of swamp puppies!",
+  "Let's shoot for 40!",
+  "Todd is just a garbage last name!",
+  "Licking ice cream is just wrong!",
+  "Touch grass!",
+  "Timmy can play golf with a bowling ball!",
+  "Wheels are more abundant than doors!",
+  "Three little birds!",
+  "Ha roligt!",
+  "Nyango Star destroys the drums!",
+  "You underestimate my power!",
+  "That's some good beans!",
+  "Spoons are not inherently evil!",
+  "Made with Javascript!",
+  "Your shoe is untied!",
+  "Good afternoon, good evening, and good night!",
+  "It's elementary, my dear Watson!",
+  "Probably doesn't contain peanuts, but who knows!",
+  "Produced in a two-story house!",
+  "I'm going on an adventure!",
+  "Dream on!",
+  "Chuck Norris can kill two stones with one bird!",
+  "Grenade!",
+  "Seal pups are pretty average!",
+  "Take a break from your phone already!",
+  "Flying straight isn't a good idea!",
+  "Still a work in progress!",
+  "Technoblade never dies!",
+  "Do not go gentle into that good night!",
+  "Everything is awesome!",
+  "Look behind you!",
+  "It's Schoology, not Schoalagy!",
+  "It is Thursday, my dudes!",
+  "That's a lotta damage!",
+  "Ask the Panzer of the Lake!",
+  "Feedback is greatly appreciated!",
+  "Emotional damage!",
+  "Brother, may I have some oats!",
+  "Think for yourself!",
+  "Tell your friends!",
+  "The Dyatlov Pass wasn't just an avalanche!",
+  "Agency FB is pretty cool!",
+  "Support the troops!",
+  "You may not sleep now, there are monsters nearby!",
+  "Microsoft One Drive is malware!",
+  "Attack the D point!",
+  "Do a barrel roll!",
+  "Try listening to real music!",
+  "It is Wednesday, my dudes!",
+  "Don't put rubber bands in your hair!",
+  "Poyo!",
+  "Free to play!",
+  "Around 4.5k lines of code!",
+  "I'm tired of this, Grandpa!"
+];
+
 document.getElementById("splashText").textContent =
-  window.SPLASH_STRINGS[Math.floor(Math.random() * window.SPLASH_STRINGS.length)];
+  splashStrings[Math.floor(Math.random() * splashStrings.length)];
 
 // VARIABLES
 
@@ -398,7 +504,239 @@ var backgroundIngame;
 var afterburnerSoundUp;      // Engine powering up
 var afterburnerSoundDown;    // Engine powering down/reverse
 
-//--------------------------PERSISTENCE---------------------//
+// ── HIGH SCORE ──
+function getHighScore() {
+  const c = document.cookie.match(/(^|;)\s*highScore=([^;]+)/);
+  return c ? parseInt(c[2]) : 0;
+}
+
+function setHighScore(score) {
+  if (score > getHighScore()) {
+    document.cookie = `highScore=${score}; expires=Thu, 18 Dec 2099 12:00:00 UTC; path=/`;
+    return true; // new record
+  }
+  return false;
+}
+
+//------------------------------VARIABLES OVER-----------------------------//
+
+
+function hideDiv(divID) {
+  var x = document.getElementById(divID);
+  x.style.display = "none";
+  console.log(divID + " hidden.");
+}
+
+function showDiv(divID) {
+  var x = document.getElementById(divID);
+  x.style.display = divID === 'startScreen' ? "flex" : "block";
+}
+
+function closePanels() {
+  ['howPlay', 'changelog', 'credits', 'settings'].forEach(id => hideDiv(id));
+  hideDiv('panelBackdrop');
+  showDiv('startScreen');
+}
+
+function setCard(shipKey) {
+  const ship = SPACESHIPS[shipKey];
+  var x = document.getElementById("spaceshipName");
+  x.innerHTML = ship.name;
+  var y = document.getElementById("spaceshipStats");
+  y.innerHTML = getShipStatsMarkup(ship, shipKey);
+  const pp = getScoreCookie();
+
+  if (ship.purchasedKey) {
+    if (!saveData.purchasedShips[ship.purchasedKey]) {
+      // Not purchased — show purchase button or lock badge
+      if (pp >= ship.price) {
+        y.innerHTML += getPurchaseButton(ship);
+      } else {
+        y.innerHTML += `<div class="shipLockBadge">Need ${(ship.price - pp).toLocaleString()} more PP</div>`;
+      }
+    }
+  }
+
+  if (getSelectedShipCookie().at(11) !== ship.name && (ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey])) {
+    y.innerHTML += getEquipButton(shipKey);
+  }
+
+  console.log("setCard function called");
+}
+
+function shipEquiped(e) {
+  e.style.display = "none";
+}
+
+function setPicture(pictureName) {
+  var x = document.getElementById("spaceshipPreview");
+  x.innerHTML = pictureName;
+  console.log("setPicture function called");
+}
+
+
+function setScorebar() {
+  let pixelPieces = getScoreCookie();
+  let highScore = getHighScore();
+  let score_hangarBar = `<span style="font-size: 20px; float:right; padding-right: 70px; padding-top: 3px; color: #e8c84a;">PIXEL PIECES: ${pixelPieces} &nbsp;|&nbsp; <span style="color:#4adc6e;">BEST: ${highScore}</span></span>`;
+  document.getElementById("hangarBar").innerHTML = `<button onclick="hideDiv('hangar') || showDiv('startScreen')" style="text-size: 16; font-family: '8bit-font-text'" class="backbuttonhangarbar">-BACK</button>` + score_hangarBar;
+  console.log("setScorebar function called");
+}
+
+// ── SCORE TEXT FLASH ──
+var lastDisplayedScore = 0;
+function flashScoreIfNeeded(currentScore) {
+  const el = document.getElementById('scoreHUD');
+  if (!el) return;
+  const rounded = Math.round(currentScore);
+  if (rounded !== lastDisplayedScore && rounded % 100 === 0 && rounded > 0) {
+    el.classList.remove('score-flash');
+    void el.offsetWidth; // reflow
+    el.classList.add('score-flash');
+  }
+  lastDisplayedScore = rounded;
+}
+
+// Update DOM HUDs for score and ammo
+function updateHUDs(currentScore) {
+  try {
+    const scoreEl = document.getElementById('scoreHUD');
+    const ammoEl  = document.getElementById('ammoHUD');
+    const s = typeof currentScore === 'number' ? Math.round(currentScore) : Math.round((distanceTraveled * getSelectedShipCookie().at(7)) / 6);
+    if (scoreEl) scoreEl.textContent = 'SCORE: ' + s;
+    if (ammoEl) {
+      ammoEl.style.display = 'flex';
+      const ammo = myGamePiece && myGamePiece.ammo != null ? myGamePiece.ammo : 0;
+      const maxAmmo = getMaxAmmo();
+      ammoEl.setAttribute('aria-label', `Ammo: ${ammo} of ${maxAmmo}`);
+      ammoEl.innerHTML = Array.from({ length: maxAmmo }, (_, index) =>
+        `<span class="ammo-cell${index < ammo ? ' is-loaded' : ''}" aria-hidden="true"></span>`
+      ).join('');
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// ── HEAT GAUGE HTML ──
+function createHeatGauge() {
+  if (document.getElementById('heatGauge')) return;
+  
+  const gaugeHTML = `
+    <div id="heatGauge" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 400px; z-index: 150; pointer-events: none; display: none;">
+      <div style="font-family: '8bit-font-text'; font-size: 14px; color: #c8c8d0; text-align: center; margin-bottom: 6px; text-shadow: 1px 1px #1a0808;">THERMAL LEVEL</div>
+      <div style="background: #1a0808; border: 2px solid #4a1a1a; border-radius: 6px; height: 18px; overflow: hidden;">
+        <div id="heatGaugeFill" style="height: 100%; width: 0%; background: #e8c84a; transition: width 0.05s ease; box-shadow: 0 0 8px rgba(232, 200, 74, 0.5);"></div>
+      </div>
+      <div id="heatGaugeText" style="font-family: '8bit-font-text'; font-size: 12px; color: #e8c84a; text-align: right; margin-top: 4px; text-shadow: 1px 1px #1a0808;">0%</div>
+    </div>
+  `;
+  
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = gaugeHTML;
+  document.body.appendChild(tempDiv.firstElementChild);
+}
+
+// Update heat gauge display
+function updateHeatGauge() {
+  let gaugeEl = document.getElementById('heatGauge');
+  let gaugeFill = document.getElementById('heatGaugeFill');
+  let gaugeText = document.getElementById('heatGaugeText');
+  
+  if (!gaugeEl) return;
+  
+  // Check if afterburner upgrade is purchased for current ship
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+  const upgrade = getShipUpgradeState(selectedShipKey);
+  const hasAfterburner = upgrade.afterburner;
+  
+  // Only show gauge if afterburner upgrade is purchased
+  if (hasAfterburner && (afterburnerActive || currentHeat > 0)) {
+    gaugeEl.style.display = 'block';
+    
+    const pct = Math.min(100, currentHeat);
+    if (gaugeFill) {
+      gaugeFill.style.width = pct + '%';
+      
+      // Color-coded heat levels
+      if (currentHeat < 40) {
+        // LOW: GREEN - Safe zone
+        gaugeFill.style.background = '#4adc6e';
+        gaugeFill.style.boxShadow = '0 0 8px #4adc6e';
+        gaugeText.style.color = '#4adc6e';
+        gaugeText.style.textShadow = '0 0 6px #4adc6e';
+      } else if (currentHeat < 65) {
+        // MID: YELLOW - Getting warm
+        gaugeFill.style.background = '#e8c84a';
+        gaugeFill.style.boxShadow = '0 0 8px #e8c84a';
+        gaugeText.style.color = '#e8c84a';
+        gaugeText.style.textShadow = '0 0 6px #e8c84a';
+      } else if (currentHeat < 85) {
+        // HIGH: ORANGE - Danger zone
+        gaugeFill.style.background = '#ff9500';
+        gaugeFill.style.boxShadow = '0 0 10px #ff9500';
+        gaugeText.style.color = '#ff9500';
+        gaugeText.style.textShadow = '0 0 6px #ff9500';
+      } else {
+        // NEAR-DEATH: RED - Critical!
+        gaugeFill.style.background = '#ff3333';
+        gaugeFill.style.boxShadow = '0 0 12px #ff3333';
+        gaugeText.style.color = '#ff3333';
+        gaugeText.style.textShadow = '0 0 8px #ff3333';
+      }
+    }
+    if (gaugeText) {
+      gaugeText.textContent = Math.round(currentHeat) + '%';
+    }
+  } else {
+    // Hide completely if no upgrade or no heat
+    gaugeEl.style.display = 'none';
+  }
+}
+
+function addScore(score) {
+  let scorep = score * getSelectedShipCookie().at(7);
+  let scoref = scorep + getScoreCookie();
+  setScoreCookie(Math.round(scoref));
+  console.log("Score: " + scoref);
+  setScorebar();
+}
+
+function purchaseAttempt(purchasePrice, shipName) {
+  if (getScoreCookie() >= purchasePrice) {
+    console.log("Purchase complete!");
+    let score = (getScoreCookie() - purchasePrice);
+    setScoreCookie(Math.round(score));
+
+    if (shipName == 'pixpro') {
+      setPurchasedShipsCookie('yes', 'no', 'no');
+      var x = document.getElementById('pixproPurchaseButton');
+      if (x) x.style.display = "none";
+      setCard('pixpro');
+    }
+
+  } else {
+    purchaseAttemptFailed(purchasePrice);
+    console.log("Purchase impossible.");
+  }
+  setScorebar();
+}
+
+function purchaseAttemptFailed(price) {
+  var x = document.getElementById('overlay');
+  x.style.display = 'block';
+  var y = document.getElementById('purchaseDialog');
+  y.style.display = 'block';
+  let pixelPieces = getScoreCookie();
+  let needPixelPieces = (price - pixelPieces);
+  let dialogHeader = `<span style="font-size: 40px; color: #e03a3a;">Purchase Attempt Failed <br><br></span>`;
+  let dialogContent = `<span style="font-size: 20px; color: #c8c8d0;">You need ${needPixelPieces} more Pixel Pieces.</span>`;
+  let dialog = dialogHeader + dialogContent;
+  y.innerHTML = dialog + `<button onclick="hideDiv('overlay') || hideDiv('purchaseDialog')" style="font-size: 20; font-family: '8bit-font-text'" class="backbuttondialog" id="backbuttondialog">BACK</button>`;
+}
+
+//--------------------------SETTING COOKIES---------------------//
+
+//--------------------------SAVE SYSTEM---------------------//
 
 const SAVE_KEY = 'pixelPilotSave';
 
@@ -554,19 +892,6 @@ function getScoreCookie() {
   return Number(saveData.score) || 0;
 }
 
-function getHighScore() {
-  const cookie = document.cookie.match(/(^|;)\s*highScore=([^;]+)/);
-  return cookie ? parseInt(cookie[2]) : 0;
-}
-
-function setHighScore(score) {
-  if (score > getHighScore()) {
-    document.cookie = `highScore=${score}; expires=Thu, 18 Dec 2099 12:00:00 UTC; path=/`;
-    return true;
-  }
-  return false;
-}
-
 /* ---------------- SELECTED SHIP ---------------- */
 
 function setSelectedShipCookie(
@@ -609,7 +934,7 @@ function setSelectedShipCookie(
 function getSelectedShipCookie() {
   const s = saveData.selectedShip;
   const gunCode = typeof s.guns === 'string' ? s.guns : GUNS[SPACESHIPS.classic.guns].code;
-  const shipKey = getSelectedShipKey();
+  const shipKey = s.name === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
   const image = getShipUpgradeState(shipKey).doubleGun
     ? SHIP_UPGRADE_CONFIG[shipKey].upgradedImage
     : s.image;
@@ -628,10 +953,6 @@ function getSelectedShipCookie() {
     image,
     s.name,
   ];
-}
-
-function getSelectedShipKey() {
-  return saveData.selectedShip.name === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
 }
 
 /* ---------------- PURCHASED SHIPS ---------------- */
@@ -705,197 +1026,6 @@ function queryShipCookie() {
   }
 }
 
-//--------------------------MENU AND HUD---------------------//
-
-function hideDiv(divID) {
-  var x = document.getElementById(divID);
-  x.style.display = "none";
-  console.log(divID + " hidden.");
-}
-
-function showDiv(divID) {
-  var x = document.getElementById(divID);
-  x.style.display = divID === 'startScreen' ? "flex" : "block";
-}
-
-function closePanels() {
-  ['howPlay', 'changelog', 'credits', 'settings'].forEach(id => hideDiv(id));
-  hideDiv('panelBackdrop');
-  showDiv('startScreen');
-}
-
-function setCard(shipKey) {
-  const ship = SPACESHIPS[shipKey];
-  var x = document.getElementById("spaceshipName");
-  x.innerHTML = ship.name;
-  var y = document.getElementById("spaceshipStats");
-  y.innerHTML = getShipStatsMarkup(ship, shipKey);
-  const pp = getScoreCookie();
-
-  if (ship.purchasedKey) {
-    if (!saveData.purchasedShips[ship.purchasedKey]) {
-      if (pp >= ship.price) {
-        y.innerHTML += getPurchaseButton(ship);
-      } else {
-        y.innerHTML += `<div class="shipLockBadge">Need ${(ship.price - pp).toLocaleString()} more PP</div>`;
-      }
-    }
-  }
-
-  if (getSelectedShipCookie().at(11) !== ship.name && (ship.purchasedKey === null || saveData.purchasedShips[ship.purchasedKey])) {
-    y.innerHTML += getEquipButton(shipKey);
-  }
-}
-
-function shipEquiped(e) {
-  e.style.display = "none";
-}
-
-function setPicture(pictureName) {
-  var x = document.getElementById("spaceshipPreview");
-  x.innerHTML = pictureName;
-}
-
-function setScorebar() {
-  let pixelPieces = getScoreCookie();
-  let highScore = getHighScore();
-  let score_hangarBar = `<span style="font-size: 20px; float:right; padding-right: 70px; padding-top: 3px; color: #e8c84a;">PIXEL PIECES: ${pixelPieces} &nbsp;|&nbsp; <span style="color:#4adc6e;">BEST: ${highScore}</span></span>`;
-  const hangarBar = document.getElementById("hangarBar");
-  if (!hangarBar) return;
-  hangarBar.innerHTML = `<button onclick="hideDiv('hangar') || showDiv('startScreen')" style="text-size: 16; font-family: '8bit-font-text'" class="backbuttonhangarbar">-BACK</button>` + score_hangarBar;
-}
-
-var lastDisplayedScore = 0;
-function flashScoreIfNeeded(currentScore) {
-  const el = document.getElementById('scoreHUD');
-  if (!el) return;
-  const rounded = Math.round(currentScore);
-  if (rounded !== lastDisplayedScore && rounded % 100 === 0 && rounded > 0) {
-    el.classList.remove('score-flash');
-    void el.offsetWidth;
-    el.classList.add('score-flash');
-  }
-  lastDisplayedScore = rounded;
-}
-
-function updateHUDs(currentScore) {
-  try {
-    const scoreEl = document.getElementById('scoreHUD');
-    const ammoEl  = document.getElementById('ammoHUD');
-    const score = typeof currentScore === 'number' ? Math.round(currentScore) : Math.round((distanceTraveled * getSelectedShipCookie().at(7)) / 6);
-    if (scoreEl) scoreEl.textContent = 'SCORE: ' + score;
-    if (ammoEl) {
-      ammoEl.style.display = 'flex';
-      const ammo = myGamePiece && myGamePiece.ammo != null ? myGamePiece.ammo : 0;
-      const maxAmmo = getMaxAmmo();
-      ammoEl.setAttribute('aria-label', `Ammo: ${ammo} of ${maxAmmo}`);
-      ammoEl.innerHTML = Array.from({ length: maxAmmo }, (_, index) =>
-        `<span class="ammo-cell${index < ammo ? ' is-loaded' : ''}" aria-hidden="true"></span>`
-      ).join('');
-    }
-  } catch (e) { /* ignore */ }
-}
-
-function createHeatGauge() {
-  if (document.getElementById('heatGauge')) return;
-
-  const gaugeHTML = `
-    <div id="heatGauge" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 400px; z-index: 150; pointer-events: none; display: none;">
-      <div style="font-family: '8bit-font-text'; font-size: 14px; color: #c8c8d0; text-align: center; margin-bottom: 6px; text-shadow: 1px 1px #1a0808;">THERMAL LEVEL</div>
-      <div style="background: #1a0808; border: 2px solid #4a1a1a; border-radius: 6px; height: 18px; overflow: hidden;">
-        <div id="heatGaugeFill" style="height: 100%; width: 0%; background: #e8c84a; transition: width 0.05s ease; box-shadow: 0 0 8px rgba(232, 200, 74, 0.5);"></div>
-      </div>
-      <div id="heatGaugeText" style="font-family: '8bit-font-text'; font-size: 12px; color: #e8c84a; text-align: right; margin-top: 4px; text-shadow: 1px 1px #1a0808;">0%</div>
-    </div>
-  `;
-
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = gaugeHTML;
-  document.body.appendChild(tempDiv.firstElementChild);
-}
-
-function updateHeatGauge() {
-  let gaugeEl = document.getElementById('heatGauge');
-  let gaugeFill = document.getElementById('heatGaugeFill');
-  let gaugeText = document.getElementById('heatGaugeText');
-
-  if (!gaugeEl) return;
-
-  const upgrade = getShipUpgradeState(getSelectedShipKey());
-
-  if (upgrade.afterburner && (afterburnerActive || currentHeat > 0)) {
-    gaugeEl.style.display = 'block';
-    const pct = Math.min(100, currentHeat);
-    if (gaugeFill) {
-      gaugeFill.style.width = pct + '%';
-      if (currentHeat < 40) {
-        gaugeFill.style.background = '#4adc6e';
-        gaugeFill.style.boxShadow = '0 0 8px #4adc6e';
-        gaugeText.style.color = '#4adc6e';
-        gaugeText.style.textShadow = '0 0 6px #4adc6e';
-      } else if (currentHeat < 65) {
-        gaugeFill.style.background = '#e8c84a';
-        gaugeFill.style.boxShadow = '0 0 8px #e8c84a';
-        gaugeText.style.color = '#e8c84a';
-        gaugeText.style.textShadow = '0 0 6px #e8c84a';
-      } else if (currentHeat < 85) {
-        gaugeFill.style.background = '#ff9500';
-        gaugeFill.style.boxShadow = '0 0 10px #ff9500';
-        gaugeText.style.color = '#ff9500';
-        gaugeText.style.textShadow = '0 0 6px #ff9500';
-      } else {
-        gaugeFill.style.background = '#ff3333';
-        gaugeFill.style.boxShadow = '0 0 12px #ff3333';
-        gaugeText.style.color = '#ff3333';
-        gaugeText.style.textShadow = '0 0 8px #ff3333';
-      }
-    }
-    if (gaugeText) gaugeText.textContent = Math.round(currentHeat) + '%';
-  } else {
-    gaugeEl.style.display = 'none';
-  }
-}
-
-function addScore(score) {
-  let scorep = score * getSelectedShipCookie().at(7);
-  let scoref = scorep + getScoreCookie();
-  setScoreCookie(Math.round(scoref));
-  console.log("Score: " + scoref);
-  setScorebar();
-}
-
-function purchaseAttempt(purchasePrice, shipName) {
-  if (getScoreCookie() >= purchasePrice) {
-    console.log("Purchase complete!");
-    let score = (getScoreCookie() - purchasePrice);
-    setScoreCookie(Math.round(score));
-
-    if (shipName == 'pixpro') {
-      setPurchasedShipsCookie('yes', 'no', 'no');
-      var x = document.getElementById('pixproPurchaseButton');
-      if (x) x.style.display = "none";
-      setCard('pixpro');
-    }
-  } else {
-    purchaseAttemptFailed(purchasePrice);
-    console.log("Purchase impossible.");
-  }
-  setScorebar();
-}
-
-function purchaseAttemptFailed(price) {
-  var x = document.getElementById('overlay');
-  x.style.display = 'block';
-  var y = document.getElementById('purchaseDialog');
-  y.style.display = 'block';
-  let pixelPieces = getScoreCookie();
-  let needPixelPieces = (price - pixelPieces);
-  let dialogHeader = `<span style="font-size: 40px; color: #e03a3a;">Purchase Attempt Failed <br><br></span>`;
-  let dialogContent = `<span style="font-size: 20px; color: #c8c8d0;">You need ${needPixelPieces} more Pixel Pieces.</span>`;
-  let dialog = dialogHeader + dialogContent;
-  y.innerHTML = dialog + `<button onclick="hideDiv('overlay') || hideDiv('purchaseDialog')" style="font-size: 20; font-family: '8bit-font-text'" class="backbuttondialog" id="backbuttondialog">BACK</button>`;
-}
-
 //--------------------------- GAME MECHANICS UNDERNEATH ----------------------------------//
 
 function startGame() {
@@ -943,7 +1073,7 @@ gameoverSound  = new sound("./audio/freesound_community-8-bit-explosion.mp3", "e
   afterburnerSoundUp = new sound("./audio/afterburner-sfx_up.mp3", "effect");
   afterburnerSoundDown = new sound("./audio/afterburner-sfx_down.mp3", "effect");
   
-  // Save audio duration once file loads
+  // Capture durations after metadata loads
   afterburnerSoundUp.sound.addEventListener('loadedmetadata', function() {
     afterburnerUpAudioDuration = this.duration || 5;
     console.log('[Afterburner] Up sound duration:', afterburnerUpAudioDuration.toFixed(2), 'seconds');
@@ -954,7 +1084,7 @@ gameoverSound  = new sound("./audio/freesound_community-8-bit-explosion.mp3", "e
     console.log('[Afterburner] Down sound duration:', afterburnerDownAudioDuration.toFixed(2), 'seconds');
   });
   
-  // Also trigger for cached audio
+  // Also trigger on load for cached audio
   if (afterburnerSoundUp.sound.readyState >= 2) {
     afterburnerUpAudioDuration = afterburnerSoundUp.sound.duration || 5;
   }
@@ -1044,7 +1174,6 @@ var myGameArea = {
 
   scaleX: 1,
   scaleY: 1,
-  listenersInitialized: false,
 
   start: function() {
 
@@ -1056,6 +1185,11 @@ var myGameArea = {
     );
 
     this.resize();
+
+    window.addEventListener(
+      "resize",
+      () => this.resize()
+    );
 
     this.frameNo = 0;
     this.lastTime = 0;
@@ -1080,16 +1214,19 @@ var myGameArea = {
 
     myGameArea.keys = {};
 
-    if (!this.listenersInitialized) {
-      window.addEventListener("resize", () => this.resize());
-      window.addEventListener("keydown", function(e) {
+    window.addEventListener(
+      "keydown",
+      function(e) {
         myGameArea.keys[e.keyCode] = true;
-      });
-      window.addEventListener("keyup", function(e) {
+      }
+    );
+
+    window.addEventListener(
+      "keyup",
+      function(e) {
         myGameArea.keys[e.keyCode] = false;
-      });
-      this.listenersInitialized = true;
-    }
+      }
+    );
   },
 
   resize: function() {
@@ -1147,22 +1284,23 @@ function component(width, height, color, x, y, type, secondaryType, healthpoints
   this.y = y;
   this.healthpoints = healthpoints;
   this.secondaryType = secondaryType;
-  if (type === "image" || type === "background" || secondaryType === "mag") {
-    this.image = new Image();
-    this.image.src = color;
-  }
-  if (secondaryType === "gamePiece") {
-    const selectedShip = getSelectedShipCookie();
-    this.gunType = selectedShip[2];
-    this.cooldown = selectedShip[3];
-    this.fireModes = selectedShip[4];
-    this.gunPosX = selectedShip[5];
-    this.gunPosY = selectedShip[6];
-  }
   this.update = function() {
-    const ctx = myGameArea.context;
+    ctx = myGameArea.context;
     const sx = myGameArea.shakeX || 0;
     const sy = myGameArea.shakeY || 0;
+
+    if (type == "image" || type == "background" || secondaryType == "mag") {
+      this.image = new Image();
+      this.image.src = color;
+    }
+
+    if (secondaryType == "gamePiece") {
+      this.gunType    = getSelectedShipCookie().at(2);
+      this.cooldown   = getSelectedShipCookie().at(3);
+      this.fireModes  = getSelectedShipCookie().at(4);
+      this.gunPosX    = getSelectedShipCookie().at(5);
+      this.gunPosY    = getSelectedShipCookie().at(6);
+    }
 
     if (secondaryType == "Trobstacle") {
       this.heighR = 0;
@@ -1300,7 +1438,8 @@ this.onCrash = function() {
   stopDynamicMusic();
   gameoverSound.play();
   hideTouchControls();
-
+  
+  // Cleanup all afterburner sounds on crash
   const crashedAfterburnerActive = afterburnerActive;
   const downWasPlaying = isPlayingDownSound;
   console.log('[Afterburner] Crashed while', crashedAfterburnerActive ? 'active' : 'inactive', '-', downWasPlaying ? 'down sound was playing' : 'down sound not active');
@@ -1355,8 +1494,55 @@ function setEndScreen() {
   else if (roundedScore >= 500)  { grade = 'C';  gradeColor = '#b07adc'; gradeBg = '#180a25'; tierLabel = '— ROOKIE PILOT —'; }
   else                           { grade = 'D';  gradeColor = '#e03a3a'; gradeBg = '#250a0a'; tierLabel = '— CADET —'; }
 
-  const gradeQuips = window.END_SCREEN_QUIPS[grade];
-  const quip = gradeQuips[Math.floor(Math.random() * gradeQuips.length)];
+const quips = {
+  'S': [
+    "Unbelievable.",
+    "Please touch some grass.",
+    "Umemployed.",
+    "Oh... hacking?",
+    "Show-off. Insufferable show-off.",
+    "You've been logged for cheating until proven otherwise.",
+    "You've ruined this for everyone else."
+  ],
+  'A': [
+    "Excellent flying, pilot.",
+    "Your ancestors are proud.",
+    "Well done. This is as far as you'll go.",
+    "So close to perfect. It's bothering me too.",
+    "You clearly have nothing better to do. Respect.",
+    "Certified competent."
+  ],
+  'B': [
+    "Solid run. You've got the stuff.",
+    "Not bad. Not bad at all.",
+    "The obstacles respect you.",
+    "Competent. Unremarkable.",
+    "Good enough that nobody will bring it up again.",
+    "Nothing to report. Which is good. That's the report."
+  ],
+  'C': [
+    "A decent attempt. The obstacles disagree.",
+    "You survived... mostly.",
+    "Room for improvement detected.",
+    "Technically a success. <i>Technically.</i>",
+    "The obstacles let you get this far. Don't read into it.",
+    "A C gets degrees."
+  ],
+  'D': [
+    "The obstacles send their regards.",
+    "Well, you tried.",
+    "Even the obstacles felt bad for you.",
+    "Better luck next time, pilot.",
+    "Don't quit your day job.",
+    "There's always next time.",
+    "That was a choice. Several choices, actually.",
+    "You made that look genuinely difficult.",
+    "Somewhere out there, a beginner is watching this and feeling confident.",
+    "No commentary available. Out of professional courtesy.",
+    "Have you considered a different hobby?"
+  ],
+};
+  const quip = quips[grade][Math.floor(Math.random() * quips[grade].length)];
 
   addScore(rawScore);
 
@@ -1818,7 +2004,8 @@ function everyinterval(n) {
   var firstShot    = true;
 
   function getMaxAmmo() {
-    const selectedShipKey = getSelectedShipKey();
+    const selectedShipName = getSelectedShipCookie().at(11);
+    const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
     const doubleGun = getShipUpgradeState(selectedShipKey).doubleGun;
     return doubleGun ? 16 : 8;
   }
@@ -1846,7 +2033,8 @@ function fireBullet() {
     myGamePiece.ammo = getMaxAmmo();
   }
 
-  const selectedShipKey = getSelectedShipKey();
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
   const doubleGun = getShipUpgradeState(selectedShipKey).doubleGun;
 
 if (myGamePiece.ammo >= (doubleGun ? 2 : 1)) {
@@ -1921,6 +2109,25 @@ if (myGamePiece.ammo >= (doubleGun ? 2 : 1)) {
       updateHUDs();
     }
   }
+}
+
+// ── HEAT GAUGE HTML ──
+function createHeatGauge() {
+  if (document.getElementById('heatGauge')) return;
+  
+  const gaugeHTML = `
+    <div id="heatGauge" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 400px; z-index: 150; pointer-events: none;">
+      <div style="font-family: '8bit-font-text'; font-size: 14px; color: #c8c8d0; text-align: center; margin-bottom: 6px; text-shadow: 1px 1px #1a0808;">THERMAL LEVEL</div>
+      <div style="background: #1a0808; border: 2px solid #4a1a1a; border-radius: 6px; height: 18px; overflow: hidden;">
+        <div id="heatGaugeFill" style="height: 100%; width: 0%; background: #e8c84a; transition: width 0.05s ease; box-shadow: 0 0 8px rgba(232, 200, 74, 0.5);"></div>
+      </div>
+      <div id="heatGaugeText" style="font-family: '8bit-font-text'; font-size: 12px; color: #e8c84a; text-align: right; margin-top: 4px; text-shadow: 1px 1px #1a0808;">0%</div>
+    </div>
+  `;
+  
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = gaugeHTML;
+  document.body.appendChild(tempDiv.firstElementChild);
 }
 
 // ── FLAME PARTICLE FUNCTIONS ──
@@ -2025,11 +2232,12 @@ const OVERHEAT_WARNING_THRESHOLD = 70;
 
 var deathCause = 'crash'; // crash or overheat
 
-var afterburnerStartTime = 0;         
-var afterburnerDuration = 0; // Duration in milliseconds
-var afterburnerUpAudioDuration = 5;   
-var afterburnerDownAudioDuration = 10;
-var isPlayingDownSound = false;      
+// NEW: Track afterburner timing for synchronized audio
+var afterburnerStartTime = 0;         // Timestamp when 'D' was pressed
+var afterburnerDuration = 0;          // Duration in milliseconds
+var afterburnerUpAudioDuration = 5;   // Known duration of up audio (seconds)
+var afterburnerDownAudioDuration = 10; // Known duration of down audio (seconds)
+var isPlayingDownSound = false;       // Track if down sound is currently playing
 
 // Flame particle system
 var engineFlames = [];
@@ -2043,34 +2251,32 @@ const FLAME_BASE_SIZE = 30;
 let afterburnerKeyDownPending = false;
 
 document.addEventListener("keydown", function afterburnerKeyDown(e) {
-  if (
-    e.key !== 'd' ||
-    !myGamePiece ||
-    myGamePiece.crashed ||
-    gamePaused ||
-    myGameArea.rafId === null
-  ) return;
-
-  const selectedShipKey = getSelectedShipKey();
-  const upgrade = getShipUpgradeState(selectedShipKey);
-
-  if (upgrade.afterburner && !afterburnerActive && !afterburnerKeyDownPending) {
-    afterburnerActive = true;
-    afterburnerKeyDownPending = true;
-
-    if (isPlayingDownSound && afterburnerSoundDown) {
-      console.log('[Afterburner] Interrupting down sound for re-activation');
-      afterburnerSoundDown.stop();
-      afterburnerSoundDown.sound.currentTime = 0;
-      isPlayingDownSound = false;
+  if (e.key === 'd' && myGamePiece) {
+    const selectedShipName = getSelectedShipCookie().at(11);
+    const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
+    const upgrade = getShipUpgradeState(selectedShipKey);
+    
+    if (upgrade.afterburner && !afterburnerActive && !afterburnerKeyDownPending) {
+      afterburnerActive = true;
+      afterburnerKeyDownPending = true;
+      
+      // If down sound is playing, stop it immediately (interrupt for re-engage)
+      if (isPlayingDownSound && afterburnerSoundDown) {
+        console.log('[Afterburner] Interrupting down sound for re-activation');
+        afterburnerSoundDown.stop();
+        afterburnerSoundDown.sound.currentTime = 0;
+        isPlayingDownSound = false;
+      }
+      
+      // Start/up sound with loop
+      afterburnerSoundUp.sound.loop = "loop";
+      afterburnerSoundUp.sound.currentTime = 0;
+      afterburnerSoundUp.play();
+      
+      // START TIMING
+      afterburnerStartTime = Date.now();
+      console.log('[Afterburner] Activated at', new Date(afterburnerStartTime).toISOString());
     }
-
-    afterburnerSoundUp.sound.loop = "loop";
-    afterburnerSoundUp.sound.currentTime = 0;
-    afterburnerSoundUp.play();
-
-    afterburnerStartTime = Date.now();
-    console.log('[Afterburner] Activated at', new Date(afterburnerStartTime).toISOString());
   }
 });
 
@@ -2079,9 +2285,11 @@ document.addEventListener("keyup", function afterburnerKeyUp(e) {
     afterburnerKeyDownPending = false;
     
     if (afterburnerActive) {
+      // Calculate proportional playback position
       afterburnerDuration = Date.now() - afterburnerStartTime;
       const durationSec = afterburnerDuration / 1000;
       
+      // INVERTED: Short holds = start at beginning of down sound, long holds = start near end
       const proportionalPosition = Math.min(
         afterburnerDownAudioDuration - ((durationSec / afterburnerUpAudioDuration) * afterburnerDownAudioDuration),
         afterburnerDownAudioDuration
@@ -2092,12 +2300,14 @@ document.addEventListener("keyup", function afterburnerKeyUp(e) {
       console.log('[Afterburner] Deactivated after', durationSec.toFixed(2), 'seconds');
       console.log('[Afterburner] Playing', remainingSeconds.toFixed(2), 'seconds of down sound from', proportionalPosition.toFixed(2), '/', afterburnerDownAudioDuration.toFixed(2));
       
+      // Stop the up sound immediately
       afterburnerActive = false;
       if (afterburnerSoundUp) {
         afterburnerSoundUp.stop();
         afterburnerSoundUp.sound.currentTime = 0;
       }
       
+      // Play proportional portion of down sound (won't stop until finished)
       if (afterburnerSoundDown) {
         afterburnerSoundDown.sound.loop = false;
         afterburnerSoundDown.sound.currentTime = 0;
@@ -2204,7 +2414,8 @@ function getShipHitboxes(x, y, w, h, angle) {
     return points.map(([px, py]) => rotatePoint(px * scaleX, py * scaleY));
   }
 
-  const shipKey = getSelectedShipKey();
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const shipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
   const normalizedPolygons = window.SHIP_HITBOXES[shipKey];
 
   return normalizedPolygons.map(points => points.map(point => rotatePoint(
@@ -2270,6 +2481,7 @@ function polygonsIntersect(first, second) {
 let gamePaused = false;
 let orientationPausedGame = false;
 
+// Track afterburner state before pause
 let wasAfterburnerActiveBeforePause = false;
 
 function pauseGame() {
@@ -2279,8 +2491,10 @@ function pauseGame() {
   myGameArea.rafId = null;
   myGameArea.lastTime = 0;
   
+  // SAVE AFTERBURNER STATE BEFORE PAUSE
   wasAfterburnerActiveBeforePause = afterburnerActive;
   
+  // Reset afterburner positioning
   shipAfterburnerOffset = 0;
   afterburnerActive = false;
   afterburnerSpeedMultiplier = 1;
@@ -2288,6 +2502,7 @@ function pauseGame() {
   engineFlames = [];
   flameEmissionTimer = 0;
   
+  // STOP AFTERBURNER AUDIO ON PAUSE
   if (afterburnerSoundUp) {
     afterburnerSoundUp.stop();
     afterburnerSoundUp.sound.currentTime = 0;
@@ -2306,11 +2521,15 @@ function resumeGame() {
   gamePaused = false;
   hideDiv('pauseScreen');
   
-  const selectedShipKey = getSelectedShipKey();
+  // RESTART AFTERBURNER AUDIO IF WAS ACTIVE WHEN PAUSED
+  const selectedShipName = getSelectedShipCookie().at(11);
+  const selectedShipKey = selectedShipName === SPACESHIPS.pixpro.name ? 'pixpro' : 'classic';
   const upgrade = getShipUpgradeState(selectedShipKey);
   
   if (wasAfterburnerActiveBeforePause && upgrade.afterburner) {
+    // Check if 'D' key is currently held down
     if (myGameArea.keys && myGameArea.keys[68]) {
+      // Re-engage afterburner
       afterburnerActive = true;
       afterburnerSoundUp.sound.loop = "loop";
       afterburnerSoundUp.sound.currentTime = 0;
@@ -2319,6 +2538,8 @@ function resumeGame() {
       isPlayingDownSound = false;
       console.log('[Afterburner] Resumed from pause (key held)');
     } else {
+      // Key was released during pause - play disengage sound proportionally
+      // Use a minimal duration to play most of the disengage sound
       afterburnerActive = false;
       if (afterburnerSoundDown) {
         afterburnerSoundDown.sound.loop = false;
@@ -2329,7 +2550,8 @@ function resumeGame() {
       console.log('[Afterburner] Disengage triggered on resume (key released)');
     }
   }
-
+  
+  // Clear the saved state
   wasAfterburnerActiveBeforePause = false;
   
   const loop = (timestamp) => {
@@ -2347,5 +2569,205 @@ window.addEventListener("keydown", function(e) {
 });
 
 //------------------------TOUCH CONTROLS----------------------------//
+
+var touchDY = 0; // -1 = up, 0 = neutral, 1 = down (normalized)
+var joystickActive = false;
+var joystickStartY = 0;
+var joystickCenterY = 0;
+var pendingGameStart = false;
+
+function isTouchDevice() {
+  return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+}
+
+function isPortraitMobile() {
+  return isTouchDevice() && window.matchMedia('(orientation: portrait)').matches;
+}
+
+function showTouchControls() {
+  if (!isTouchDevice()) return;
+  document.getElementById('touchControls').style.display = 'block';
+  document.getElementById('touchFireBtn').style.display = 'flex';
+}
+
+function hideTouchControls() {
+  document.getElementById('touchControls').style.display = 'none';
+  document.getElementById('touchFireBtn').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function setupJoystick() {
+  const outer = document.getElementById('joystickOuter');
+  const knob = document.getElementById('joystickKnob');
+
+  if (!outer || !knob) {
+    console.warn('Joystick elements not found');
+    return;
+  }
+
+  const maxDist = 36;
+
+  function onStart(e) {
+    e.preventDefault();
+    joystickActive = true;
+    const touch = e.touches ? e.touches[0] : e;
+    const rect = outer.getBoundingClientRect();
+    joystickCenterY = rect.top + rect.height / 2;
+    joystickStartY = touch.clientY;
+  }
+
+  function onMove(e) {
+    e.preventDefault();
+    if (!joystickActive) return;
+    const touch = e.touches ? e.touches[0] : e;
+    const dy = touch.clientY - joystickCenterY;
+    const clamped = Math.max(-maxDist, Math.min(maxDist, dy));
+    knob.style.transform = `translate(-50%, calc(-50% + ${clamped}px))`;
+    touchDY = clamped / maxDist;
+  }
+
+  function onEnd(e) {
+    joystickActive = false;
+    touchDY = 0;
+    knob.style.transform = 'translate(-50%, -50%)';
+  }
+
+  outer.addEventListener('touchstart', onStart, { passive: false });
+  outer.addEventListener('touchmove',  onMove,  { passive: false });
+  outer.addEventListener('touchend',   onEnd,   { passive: false });
+  outer.addEventListener('touchcancel',onEnd,   { passive: false });
+});
+
+document.addEventListener('DOMContentLoaded', function setupFireBtn() {
+  const btn = document.getElementById('touchFireBtn');
+
+  if (!btn) {
+    console.warn('Fire button not found');
+    return;
+  }
+
+  btn.addEventListener(
+    'pointerdown',
+    function (e) {
+      e.preventDefault();
+      fireBullet();
+    },
+    { passive: false }
+  );
+});
+
 //------------------------SETTINGS----------------------------//
+
+function buildSettingsPanel() {
+  const panel = document.getElementById('settings');
+  panel.innerHTML = `
+    <p style="font-size: 60px; font-family: '8bit-font-text'; color: #e8c84a;">Settings</p>
+    <div style="max-width:380px; margin: 0 auto; text-align:left;">
+
+      <div class="settings-row">
+        <label>Music Volume</label>
+        <input type="range" min="0" max="1" step="0.05" value="${settingsMusicVol}"
+          oninput="setMusicVolume(this.value); document.getElementById('mvLabel').textContent=Math.round(this.value*100)+'%'; if(musicMaster) musicMaster.gain.value=settingsMusicVol; menuMusic.sound.volume=settingsMusicVol;">
+        <span id="mvLabel">${Math.round(settingsMusicVol * 100)}%</span>
+      </div>
+
+      <div class="settings-row">
+        <label>SFX Volume</label>
+        <input type="range" min="0" max="1" step="0.05" value="${settingsSfxVol}"
+          oninput="setSfxVolume(this.value); document.getElementById('sfxLabel').textContent=Math.round(this.value*100)+'%';">
+        <span id="sfxLabel">${Math.round(settingsSfxVol * 100)}%</span>
+      </div>
+
+      <div class="settings-row" style="margin-top:18px;">
+        <label>Show Hitboxes</label>
+        <button id="hitboxToggleBtn" class="settings-toggle ${settingsShowHitbox ? 'on' : ''}"
+          onclick="settingsShowHitbox=!settingsShowHitbox; this.textContent=settingsShowHitbox?'ON':'OFF'; this.classList.toggle('on', settingsShowHitbox);">
+          ${settingsShowHitbox ? 'ON' : 'OFF'}
+        </button>
+        <span></span>
+      </div>
+
+      <p style="font-size:13px; font-family:'8bit-font-text'; color:#5a5a6a; margin-top:20px;">
+        Audio settings are applied immediately and save when you leave the game. Hitbox visibility is for debugging and will not save. 
+      </p>
+    </div>
+    <br>
+    <button style="font-family: '8bit-font-text'" class="button_hp button_hp1" onclick="hideDiv('settings') || hideDiv('panelBackdrop') || showDiv('startScreen')">BACK</button>
+  `;
+}
+
 //------------------------End of Game Mechanics-------------------//
+
+// build pane before showing it
+    document.querySelector('.button5').addEventListener('click', function() {
+      buildSettingsPanel();
+    });
+
+    function updatePortraitGameBlocker() {
+      const blocker = document.getElementById('portraitGameBlocker');
+      if (!blocker) return;
+
+      if (isPortraitMobile()) {
+        const gameIsRunning = myGameArea.rafId != null;
+        if (!pendingGameStart && !gameIsRunning) return;
+
+        if (gameIsRunning) {
+          myGameArea.stop();
+          gamePaused = true;
+          orientationPausedGame = true;
+          hideTouchControls();
+        }
+        blocker.style.display = 'flex';
+        return;
+      }
+
+      if (blocker.style.display === 'flex') {
+        blocker.style.display = 'none';
+        if (pendingGameStart) {
+          pendingGameStart = false;
+          hideDiv('startScreen');
+          hideDiv('menuBackground');
+          startGame();
+          return;
+        }
+        if (orientationPausedGame) {
+          orientationPausedGame = false;
+          showTouchControls();
+          resumeGame();
+          return;
+        }
+
+        hideTouchControls();
+      }
+    }
+
+    window.addEventListener('resize', updatePortraitGameBlocker);
+    window.addEventListener('orientationchange', updatePortraitGameBlocker);
+
+  (function() {
+    // Check if url is the dev site
+    if (window.location.hostname === 'pixelpilotdev.w3spaces.com') {
+
+      const banner = document.createElement('div');
+      banner.textContent = 'Dev site: Expect unfinished features';
+      
+ 
+      Object.assign(banner.style, {
+        position: 'fixed',
+        bottom: '0',
+        left: '0',
+        right: '0',
+        backgroundColor: '#ffeb3b',
+        color: '#333',
+        textAlign: 'center',
+        padding: '8px 16px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        zIndex: '9999',
+        border: '1px solid #ffc107',
+        boxShadow: '0 -2px 5px rgba(0,0,0,0.1)'
+      });
+
+     
+      document.body.appendChild(banner);
+    }
+  })();
